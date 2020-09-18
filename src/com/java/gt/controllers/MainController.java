@@ -14,7 +14,7 @@ public class MainController {
     /**
      * Liste des équipements manipulés
      */
-    public static String[] EQUIPMENT_LIST = {"unite","telephone"};
+    public static String[] EQUIPMENT_LIST = {"margeur","unite","reception","autres"};
     public static ArrayList<EquipmentController> equipmentList = new ArrayList<EquipmentController>();
     public static String[][] CURRENT_TASK_LIST;
     public static String[] CURRENT_TASK_LIST_HEADER = {"", "", "", "", ""};
@@ -39,7 +39,8 @@ public class MainController {
         int index = 1;
         for(String equipName: MainController.EQUIPMENT_LIST) {
             StorageController storageController = new StorageController(equipName);
-            ArrayList<Task> taskList =  storageController.getFileReader().getTaskList();
+            ArrayList<Task> taskList = new ArrayList<Task>();
+            taskList =  storageController.getFileReader().getTaskList();
             Equipment equipement = null;
             if(taskList != null) {
                 equipement = new Equipment(index, equipName, taskList);
@@ -47,6 +48,8 @@ public class MainController {
             if(equipement != null) {
                 //System.out.println("Storage controller: " + storageController);
                 MainController.equipmentList.add(new EquipmentController(equipement, storageController));
+                
+                storageController.getTaskList();
             }
             index++;
         }
@@ -82,6 +85,12 @@ public class MainController {
         EquipmentController equipmentController = MainController.getEquipementById(indexEquip);
         return equipmentController.getEquipment().getTaskList();
     }
+    
+    public static ArrayList<Task> getAllEquipementTasks(String NameEquip) {
+        EquipmentController equipmentController = MainController.getEquipementByTagName(NameEquip);
+        return equipmentController.getEquipment().getTaskList();
+    }    
+    
     /**
      * @param indexEquip
      * @param indexTask
@@ -131,7 +140,14 @@ public class MainController {
     public static EquipmentController getEquipementById(int indexEquip) {
         return MainController.equipmentList.get(indexEquip);
     }
-    
+
+    public static EquipmentController getEquipementByTagName(String NameEquip) {
+        for(int i=0; i<equipmentList.size(); i++)
+            if(equipmentList.get(i).getEquipment().getName()== NameEquip)
+                return equipmentList.get(i);
+        return null;
+    }
+
     /**
      * @param equipmentController
      * @return boolean

@@ -25,6 +25,14 @@ public class CustomFileWriter {
 
     // Définition des constructeurs
     public CustomFileWriter(){}
+    
+    public CustomFileWriter(String folderName, String[] data){
+        this.folderName = folderName;
+        this.file = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + folderName + "/" + StorageConfig.DEFAULT_HISTORY_FILE_STORAGE_NAME);
+        this.folder = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + folderName);
+        StorageConfig.createFolderIfNotExist(this.folder);
+        StorageConfig.createFileIfNotExist(this.file);
+    }
 
     public CustomFileWriter(String folderName) {
         this.folderName = folderName;
@@ -34,6 +42,17 @@ public class CustomFileWriter {
         StorageConfig.createFileIfNotExist(this.file);
     }
 
+    public void saveData(String[] data) {
+        String line = this.computeFileLine(data);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.file.getAbsolutePath(), true))) {
+            writer.write(line);
+            writer.newLine();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        };
+    }
+   
     public void saveTask(Task task) {
         String line = this.computeFileLine(task);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.file.getAbsolutePath(), true))) {
@@ -52,6 +71,12 @@ public class CustomFileWriter {
             + "-" + lastMaintaintDate + "-" + task.getOperatingTime() 
             + "-" + task.getType();
         return line;
+    }
+    
+    public String computeFileLine(String[] data) {
+        
+        return data[3]+ "-" + data[0] + "-" + data[2]+ "-"+ data[1];
+        
     }
 
     public void renderAllTasks(ArrayList<Task> newTaskList) {
@@ -78,6 +103,18 @@ public class CustomFileWriter {
             }
         }
     }
+    
+    public void reinitilaliseFile(File file) {
+        if(file.exists())
+            file.delete();
+        if(!file.exists()){
+            try {
+                file.createNewFile();
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public String getFolderName() {
 	return folderName;
@@ -87,6 +124,10 @@ public class CustomFileWriter {
         this.folderName = folderName;
     }
 
+    public File getFile(){
+        return file;
+    }
+    
     @Override
     public String toString() {
         return "CustomFileWriter{" + "file=" + file + ", folderName=" + folderName + '}';

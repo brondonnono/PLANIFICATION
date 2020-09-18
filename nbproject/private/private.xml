@@ -3,7 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/Users/Ordinateur/Documents/NetBeansProjects/PLANIFICATION/src/com/java/gt/beans/Task.java</file>
+            <file>file:/C:/Users/Ordinateur/Documents/NetBeansProjects/PLANIFICATION/src/com/java/gt/beans/Equipment.java</file>
             <file>file:/C:/Users/Ordinateur/Documents/NetBeansProjects/PLANIFICATION/src/com/java/gt/views/Accueil.java</file>
+            <file>file:/C:/Users/Ordinateur/Documents/NetBeansProjects/PLANIFICATION/src/com/java/gt/controllers/beans_controllers/EquipmentController.java</file>
+            <file>file:/C:/Users/Ordinateur/Documents/NetBeansProjects/PLANIFICATION/src/com/java/gt/controllers/MainController.java</file>
+            <file>file:/C:/Users/Ordinateur/Documents/NetBeansProjects/PLANIFICATION/src/com/java/gt/controllers/store_controllers/StorageController.java</file>
         </group>
     </open-files>
 </project-private>

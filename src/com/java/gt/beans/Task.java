@@ -12,6 +12,7 @@ public class Task {
     // Définition des attributs
     // Définition de la liste des types de tâches
     public static String[] TASK_TYPE = {"GRAISSAGE_HUILE", "REGLAGE", "NETTOYAGE"};
+    public static String[] TASK_TYPE_LABEL = {"Graissage à l'huile", "Réglage", "Néttoyage"};
 
     private Equipment equipment;
     private int id;
@@ -39,6 +40,11 @@ public class Task {
         this.type = type;
     }
       
+    public Task(String folderName, String type, String article, int interval){
+        this.type = type;
+        this.interval = interval;
+    }
+    
     // Définition des getters and setters
     public int getId() {
         return id;
@@ -55,7 +61,7 @@ public class Task {
             String type = "";
             switch (this.type) {
                     case "GRAISSAGE_HUILE":
-                            type = "Graissage à huile";
+                            type = "Graissage à l'huile";
                             break;
                     case "REGLAGE":
                             type = "Réglage";
@@ -64,6 +70,7 @@ public class Task {
                             type = "Néttoyage";
                             break;
                     default:
+                            type ="Tous";
                             break;
             }
             return this.equipment.getName() + " " + type;

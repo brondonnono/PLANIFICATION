@@ -17,6 +17,8 @@ public class StorageConfig {
      */
     public static String DEFAULT_FOLDER_STORAGE_NAME = "data";
     public static String DEFAULT_FILE_STORAGE_NAME = "taskList.txt";
+   //nom du fichier de stockage des historiques des taches 
+    public static String DEFAULT_HISTORY_FILE_STORAGE_NAME = "history.txt";
     
     /**
      * @void

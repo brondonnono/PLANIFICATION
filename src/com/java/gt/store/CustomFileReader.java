@@ -1,5 +1,6 @@
 package com.java.gt.store;
 
+import com.java.gt.beans.History;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,12 +22,14 @@ import com.java.gt.configurations.StorageConfig;
 public class CustomFileReader {
     // Définition des attributs
     // Définition du fichier
-    private File file;
+    private File file, fileHistory;
     // Définition du dossier
     private File folder;
     private String folderName;
     // Définition de la liste des tâches qui seront lues dépuis le fichier
     private ArrayList<Task> taskList = new ArrayList<Task>();
+    private ArrayList<History> historyList = new ArrayList<History>();
+
 
     public CustomFileReader(){}
 
@@ -41,9 +44,11 @@ public class CustomFileReader {
         this.folderName = folderName;
         this.taskList = new ArrayList<Task>();
         this.file = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + folderName + "/" + StorageConfig.DEFAULT_FILE_STORAGE_NAME);
+        this.fileHistory = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + folderName + "/" + StorageConfig.DEFAULT_HISTORY_FILE_STORAGE_NAME);
         this.folder = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + folderName);
         StorageConfig.createFolderIfNotExist(this.folder);
         StorageConfig.createFileIfNotExist(this.file);
+        System.out.println("folderName: "+this.folderName);
     }
     /**
      * @param attributeList
@@ -65,6 +70,17 @@ public class CustomFileReader {
         String type =  attributeList[5];
         Task t = new Task(index, name, interval, secteur, lastMaintaintDate, operatingTime, type);
         this.taskList.add(t);
+    }
+    
+    public void computeHistory(String[] attributeList, int index) {
+
+        String article = attributeList[0];   
+        System.out.println("article: "+article);
+        String date = attributeList[1];
+        String operator = attributeList[2];
+        String hour =  attributeList[3];
+        History h = new History(index, article, date, operator, hour);
+        this.historyList.add(h);
     }
 
     /**
@@ -92,6 +108,27 @@ public class CustomFileReader {
         } catch(IOException e) {} 
         return null;
     }
+
+        public ArrayList<History> readFileDataHistory() {
+        String fileName = this.fileHistory.getAbsolutePath();
+        Path path = Paths.get(fileName);
+        try {
+            if(!Files.readAllLines(path).isEmpty()) {      
+                int index = 1;
+                for(String line: Files.readAllLines(path)) {
+                    String[] attributeList = line.split("-");
+                    if(attributeList.length > 0) {
+                        this.computeHistory(attributeList, index);
+                    }
+                    index++;
+                }
+                for(History hist:historyList)
+            System.out.println("article history: "+hist.getArticle());
+                return this.historyList;
+            }
+        } catch(IOException e) {} 
+        return new ArrayList<History>();
+    }
     
     /**
      * Afficher toutes les tâches luent dans la console
@@ -99,7 +136,7 @@ public class CustomFileReader {
     public void displayTasks() {
         if(this.taskList.size() > 0) {
             this.taskList.forEach((task) -> {
-                System.out.println(task.toString());
+                //System.out.println(task.toString());
             });
         }
     }
@@ -119,6 +156,15 @@ public class CustomFileReader {
 
     public void setTaskList(ArrayList<Task> taskList) {
         this.taskList = taskList;
+    }
+    
+    public ArrayList<History> getHistoryList() {
+        System.out.println("getHistoryList :\n"+ historyList);
+        return historyList;
+    }
+    
+    public void setHistoryList(ArrayList<History> historyList) {
+        this.historyList = historyList;
     }
     
     @Override

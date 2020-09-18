@@ -1,7 +1,10 @@
 package com.java.gt.controllers.store_controllers;
 
+import com.java.gt.beans.History;
+import com.java.gt.beans.Task;
 import com.java.gt.store.CustomFileReader;
 import com.java.gt.store.CustomFileWriter;
+import java.util.ArrayList;
 
 /**
  * @author Arléon Zemtsop
@@ -18,6 +21,11 @@ public class StorageController {
     private CustomFileWriter fileWriter;
     private String folderName;
     
+    // Définition de la liste des tâches qui seront lues dépuis le fichier
+    private ArrayList<Task> taskList;
+    
+    private ArrayList<History> historyList;
+
     // Définitions des constructeurs
     public StorageController() {}
 
@@ -32,8 +40,9 @@ public class StorageController {
     public StorageController(String folderName) {
         this.folderName = folderName;
         this.fileReader = new CustomFileReader(folderName);
-        this.fileReader.readFileData();
-        this.fileWriter = new CustomFileWriter(folderName);
+        this.taskList = new ArrayList<Task>();
+       this.taskList = this.fileReader.readFileData();
+       this.fileWriter = new CustomFileWriter(folderName);
     }
 
     // Définitions des getters and setters
@@ -59,6 +68,10 @@ public class StorageController {
 
     public void setFolderName(String folderName) {
         this.folderName = folderName;
+    }
+    
+    public ArrayList<Task> getTaskList() {
+    return taskList;
     }
 
     @Override
