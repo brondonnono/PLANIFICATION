@@ -34,6 +34,11 @@ public class CustomFileWriter {
         StorageConfig.createFileIfNotExist(this.file);
     }
 
+    public CustomFileWriter(String[] data, String defaultFileName){
+        this.file = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + defaultFileName);
+        StorageConfig.createFileIfNotExist(this.file);
+    }
+
     public CustomFileWriter(String folderName) {
         this.folderName = folderName;
         this.file = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + folderName + "/" + StorageConfig.DEFAULT_FILE_STORAGE_NAME);
@@ -43,6 +48,17 @@ public class CustomFileWriter {
     }
 
     public void saveData(String[] data) {
+        String line = this.computeFileLine(data);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.file.getAbsolutePath(), true))) {
+            writer.write(line);
+            writer.newLine();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        };
+    }
+
+    public void saveNotificationData(String[] data) {
         String line = this.computeFileLine(data);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.file.getAbsolutePath(), true))) {
             writer.write(line);
@@ -74,9 +90,11 @@ public class CustomFileWriter {
     }
     
     public String computeFileLine(String[] data) {
-        
         return data[3]+ "-" + data[0] + "-" + data[2]+ "-"+ data[1];
-        
+    }
+
+    public String computeNotificationFileLine(String[] data) {
+        return data[0]+ "-" + data[1] + "-" + data[2];
     }
 
     public void renderAllTasks(ArrayList<Task> newTaskList) {

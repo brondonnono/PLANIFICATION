@@ -1,6 +1,7 @@
 package com.java.gt.store;
 
 import com.java.gt.beans.History;
+import com.java.gt.beans.Notification;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,13 +23,14 @@ import com.java.gt.configurations.StorageConfig;
 public class CustomFileReader {
     // Définition des attributs
     // Définition du fichier
-    private File file, fileHistory;
+    private File file, fileHistory, notificationsFile;
     // Définition du dossier
     private File folder;
     private String folderName;
     // Définition de la liste des tâches qui seront lues dépuis le fichier
     private ArrayList<Task> taskList = new ArrayList<Task>();
     private ArrayList<History> historyList = new ArrayList<History>();
+    private ArrayList<Notification> notificationList = new ArrayList<Notification>();
 
 
     public CustomFileReader(){}
@@ -45,10 +47,13 @@ public class CustomFileReader {
         this.taskList = new ArrayList<Task>();
         this.file = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + folderName + "/" + StorageConfig.DEFAULT_FILE_STORAGE_NAME);
         this.fileHistory = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + folderName + "/" + StorageConfig.DEFAULT_HISTORY_FILE_STORAGE_NAME);
+        this.notificationsFile = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + StorageConfig.DEFAULT_NOTIFICATION_FILE_NAME);
         this.folder = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + folderName);
         StorageConfig.createFolderIfNotExist(this.folder);
         StorageConfig.createFileIfNotExist(this.file);
-        System.out.println("folderName: "+this.folderName);
+        StorageConfig.createFileIfNotExist(this.fileHistory);
+        StorageConfig.createFileIfNotExist(this.notificationsFile);
+        System.out.println("folderName: " + this.folderName);
     }
     /**
      * @param attributeList
@@ -83,6 +88,18 @@ public class CustomFileReader {
         this.historyList.add(h);
     }
 
+    public void computeNotification(String[] attributeList, int index) {
+        Date createdAt = null; 
+        try {
+            createdAt = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(attributeList[0]);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        String message = attributeList[1];   
+        Notification n = new Notification(index, createdAt, message);
+        this.notificationList.add(n);
+    }
+
     /**
      * @return ArrayList<Task>
      * Cette fonction parcours le fichier et le lit lignes après lignes
@@ -109,7 +126,7 @@ public class CustomFileReader {
         return null;
     }
 
-        public ArrayList<History> readFileDataHistory() {
+    public ArrayList<History> readFileDataHistory() {
         String fileName = this.fileHistory.getAbsolutePath();
         Path path = Paths.get(fileName);
         try {
@@ -123,11 +140,32 @@ public class CustomFileReader {
                     index++;
                 }
                 for(History hist:historyList)
-            System.out.println("article history: "+hist.getArticle());
+                    System.out.println("article history: "+hist.getArticle());
                 return this.historyList;
             }
         } catch(IOException e) {} 
         return new ArrayList<History>();
+    }
+
+    public ArrayList<Notification> readFileDataNotification() {
+        String fileName = this.notificationsFile.getAbsolutePath();
+        Path path = Paths.get(fileName);
+        try {
+            if(!Files.readAllLines(path).isEmpty()) {      
+                int index = 1;
+                for(String line: Files.readAllLines(path)) {
+                    String[] attributeList = line.split("-");
+                    if(attributeList.length > 0) {
+                        this.computeHistory(attributeList, index);
+                    }
+                    index++;
+                }
+                for(Notification notif: this.notificationList)
+                    System.out.println("notification: " + notif.toString());
+                return this.notificationList;
+            }
+        } catch(IOException e) {} 
+        return new ArrayList<Notification>();
     }
     
     /**
@@ -166,9 +204,22 @@ public class CustomFileReader {
     public void setHistoryList(ArrayList<History> historyList) {
         this.historyList = historyList;
     }
+
+    public ArrayList<Notification> getNotificationList() {
+        System.out.println("getNotificationList :\n"+ this.notificationList);
+        return this.notificationList;
+    }
     
+    public void setNotificationList(ArrayList<Notification> notificationList) {
+        this.notificationList = notificationList;
+    }
+
     @Override
     public String toString() {
-        return "CustomFileReader{" + "file=" + file + ", folderName=" + folderName + ", taskList=" + taskList + '}';
+        return "CustomFileReader [file=" + file + ", fileHistory=" + fileHistory + ", folder=" + folder
+                + ", folderName=" + folderName + ", historyList=" + historyList + ", notificationList="
+                + notificationList + ", notificationsFile=" + notificationsFile + ", taskList=" + taskList + "]";
     }
+    
+  
 }
