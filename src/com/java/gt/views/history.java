@@ -24,11 +24,11 @@ import javax.swing.table.DefaultTableModel;
 public class history extends javax.swing.JFrame {
     private static String article;
     private DefaultTableModel model;
-    private ArrayList<History> historyList, historyListArranged = new ArrayList<History>();
+    private ArrayList<History> historyList = new ArrayList<History>(), historyListArranged = new ArrayList<History>(), historyNewList = new ArrayList<History>(), newHistoryList = new ArrayList<History>();
     private static File historyFile;
     private CustomFileWriter fileWriter;
     private CustomFileReader fileReader;
-
+    private Accueil parent;
     /**
      * Creates new form history
      */
@@ -36,11 +36,12 @@ public class history extends javax.swing.JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
     
-    public history(CustomFileWriter fileWriter, CustomFileReader fileReader, String id, String article) {
+    public history(Accueil parent, String id, String article) {
         
-        this.historyListArranged.clear();
-        this.fileWriter = fileWriter;
-        this.fileReader = fileReader;
+        //this.historyListArranged.clear();
+        this.parent = parent;
+        this.fileWriter = parent.storageController.getFileWriter();
+        this.fileReader = parent.storageController.getFileReader();
         this.article = article;
         this.historyList = this.fileReader.readFileDataHistory();
         historyFile =  new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + this.fileWriter.getFolderName() + "/" + StorageConfig.DEFAULT_HISTORY_FILE_STORAGE_NAME);
@@ -64,7 +65,7 @@ public class history extends javax.swing.JFrame {
     
     private void arrangeHistoryList(ArrayList<History> historyList){
         historyList.forEach((history) -> {
-           if(history.getArticle().equals(this.article)){
+           if(history.getId() == (Integer.parseInt(parent.elem[0]))){
                this.historyListArranged.add(history);
                System.out.println(article);
                System.out.println("historyListArranged: "+this.historyListArranged.toString());
@@ -81,13 +82,24 @@ public class history extends javax.swing.JFrame {
         model.addColumn("Article");
         model.addColumn("Date");
         model.addColumn("Opérateur");
-        model.addColumn("Heure");
         //storageController = new StorageController(this.folderName);
         //System.out.println("historyList:\n"+ historyList);
 /**/        this.historyListArranged.forEach((history) -> {
-                model.addRow(new Object[]{history.getId(), history.getArticle(), history.getDate(), history.getOperator(), history.getHour()});
+                model.addRow(new Object[]{history.getId(), history.getArticle(), history.getDate(), history.getOperator()});
         });
         tble_history.setModel(model);
+    }
+    
+    private void clearHistory(ArrayList<History> historyList){
+        historyList.forEach((notif) ->{
+            if(notif.getId() == Integer.parseInt(parent.elem[0]))
+                System.out.println("id :"+ notif.getId());
+            else 
+                newHistoryList.add(notif);
+        });
+        System.out.println("HistoryList: "+ historyNewList);
+        System.out.println("id: "+parent.elem[0]+" History new :"+ newHistoryList);
+        new CustomFileWriter().renderAllHistory(newHistoryList, historyFile);
     }
     
     /**
@@ -116,7 +128,7 @@ public class history extends javax.swing.JFrame {
 
             },
             new String [] {
-                "#", "Article", "Date", "Opérateur", "Heure"
+                "#", "Article", "Date", "Opérateur"
             }
         ));
         tble_history.setRowSelectionAllowed(false);
@@ -129,7 +141,6 @@ public class history extends javax.swing.JFrame {
             tble_history.getColumnModel().getColumn(0).setMaxWidth(20);
             tble_history.getColumnModel().getColumn(1).setPreferredWidth(200);
             tble_history.getColumnModel().getColumn(3).setPreferredWidth(80);
-            tble_history.getColumnModel().getColumn(4).setPreferredWidth(20);
         }
 
         jPanel1.setBackground(new java.awt.Color(0, 0, 0));
@@ -210,10 +221,10 @@ public class history extends javax.swing.JFrame {
     private void cleanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cleanActionPerformed
         // TODO add your handling code here:
         try {
-            if(JOptionPane.showConfirmDialog(null,"Attention vous allez supprimer tout l'historique de cette tâche, voulez vous continuez?","Effacer tout l'historique",JOptionPane.YES_NO_OPTION) == JOptionPane.OK_OPTION)
-                fileWriter.reinitilaliseFile(historyFile);
-                this.historyListArranged.clear();
-                initializeTable();
+            //this.historyNewList = fileReader.readFileDataHistory(historyFile);
+            clearHistory(this.historyNewList);
+            this.historyListArranged.clear();
+            initializeTable();
         }catch (Exception e) {
             JOptionPane.showMessageDialog (null,"Erreur de suppression \n"+e.getMessage());
         }

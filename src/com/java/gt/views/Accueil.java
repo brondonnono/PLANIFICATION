@@ -796,7 +796,7 @@ public class Accueil extends javax.swing.JFrame {
     private void btn_historyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_historyActionPerformed
         // TODO add your handling code here:
 
-        new history(storageController.getFileWriter(),storageController.getFileReader(), elem[0], elem[3]).setVisible(true);
+        new history(this, elem[0], elem[3]).setVisible(true);
     }//GEN-LAST:event_btn_historyActionPerformed
 
     private void btn_unityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_unityActionPerformed

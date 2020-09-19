@@ -5,6 +5,7 @@
  */
 package com.java.gt.views;
 
+import com.java.gt.beans.History;
 import com.java.gt.beans.Notification;
 import com.java.gt.beans.Task;
 import com.java.gt.configurations.StorageConfig;
@@ -219,11 +220,12 @@ public class validate extends javax.swing.JFrame {
         try{
             data[2] = date.getText();
             data[3] = nomOp.getText();
-            data[4] = heure.getText();
+            data[2] = data[2]+" "+heure.getText();
             for(String str:data)
                 System.out.println(str);
             file = new CustomFileWriter(folderName, data);
-            file.saveData(data);
+            
+            file.saveData(new History(Integer.parseInt(data[0]), data[1], data[2], data[3]));
             reinitializeTask();
             ClearNotification();
             
