@@ -1,5 +1,6 @@
 package com.java.gt.beans;
 
+import com.java.gt.controllers.beans_controllers.TaskController;
 import java.util.Date;
 
 /**
@@ -26,7 +27,7 @@ public class Task {
     // Temps d'exécution de la tâche courante depuis la dernière maintenance 
     private int operatingTime;
     private String type;
-
+    
     // Définition des constructeurs
     public Task() {}
 
@@ -43,6 +44,7 @@ public class Task {
     public Task(String folderName, String type, String article, int interval){
         this.type = type;
         this.interval = interval;
+        this.secteur = article;
     }
     
     // Définition des getters and setters
@@ -122,7 +124,7 @@ public class Task {
     }
     public String displayOperatingTime() { 
             String opTimeInHours = Math.round(this.operatingTime/3600) + "";
-            return opTimeInHours + "/" + opTimeInHours;
+            return opTimeInHours + "/" + interval + "                      "+ TaskController.displayPourcentage(this);
     }
     public void setOperatingTime(int operatingTime) {
             this.operatingTime = operatingTime;
@@ -133,7 +135,6 @@ public class Task {
     public void setType(String type) {
             this.type = type;
     }
-
     public Equipment getEquipment() {
         return equipment;
     }

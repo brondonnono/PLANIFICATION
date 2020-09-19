@@ -4,10 +4,15 @@
  * and open the template in the editor.
  */
 package com.java.gt.views;
+import com.java.gt.beans.History;
+import com.java.gt.beans.Notification;
 import com.java.gt.beans.Task;
 import com.java.gt.calendar.CalendrierCadre;
+import com.java.gt.components.NotificationCellRenderer;
+import com.java.gt.components.NotificationModel;
 import com.java.gt.controllers.MainController;
 import com.java.gt.controllers.store_controllers.StorageController;
+import com.java.gt.store.CustomFileReader;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -34,18 +39,19 @@ public class Accueil extends javax.swing.JFrame {
     
     private final static int nb = 4, n = 3;
     private CalendrierCadre calend;
-    private ActionListener listener, actionListener, tableListener;
+    private ActionListener listener, actionListener;
     private JButton[] boutons = new JButton[nb], buttons = new JButton[n];
-    private DefaultTableModel model;
+    private DefaultTableModel model, notifModel;
     private MainController control = new MainController();
-    private ArrayList<Task> taskList = new ArrayList<Task>();
+    public ArrayList<Task> taskList = new ArrayList<Task>(), taskListArranged = new ArrayList<Task>();
+    public ArrayList<Notification> notificationList = new ArrayList<Notification>();
     private final String[] EQUIPMENT_LIST = control.EQUIPMENT_LIST;
     public final String[] TASK_TYPE = new Task().TASK_TYPE_LABEL;
-//public final String[] TASK_TYPE = {"Graissage à l'huile", "Réglage", "Néttoyage"};
-    private StorageController storageController;
+    public StorageController storageController;
     public String[] checked = {"",""}, elem = {"","","","",""};
-    private Border actif ;
     private final static String title = "PLANIFICATION"; 
+    public NotificationModel notificationModel = new NotificationModel();
+    public 
         
              // control.init();
     
@@ -58,8 +64,7 @@ public class Accueil extends javax.swing.JFrame {
         main_pan.remove(pan_alert);
         this.setTitle(title);
         this.setSize((int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth(), (int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() -35);
-        this.setIconImage((new ImageIcon(getClass().getResource("/com/java/gt"
-                + "/img/logo.png"))).getImage());
+        this.setIconImage((new ImageIcon(getClass().getResource("/com/java/gt/img/logo.png"))).getImage());
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         //this.setDefaultCloseOperation(HIDE_ON_CLOSE);
         try {
@@ -70,10 +75,11 @@ public class Accueil extends javax.swing.JFrame {
         }
     }
 
-    private void initTable() {
-        
+    private void initTable(String type) {
+   
         model= new DefaultTableModel();
         
+        model.addColumn("#");
         model.addColumn("Dispositif");
         model.addColumn("Intervalle");
         model.addColumn("Article");
@@ -81,11 +87,13 @@ public class Accueil extends javax.swing.JFrame {
         model.addColumn("Temps [H]");
         
         this.taskList = storageController.getFileReader().getTaskList();
-        this.taskList.forEach((task) -> {
+        arrangeTaskList(taskList,type);
+        this.taskListArranged.forEach((task) -> {
             System.out.println(task);
-            model.addRow(new Object[]{task.getSecteur(),task.getInterval(),task.getType()+" "+task.getName(),task.getLastMaintaintDate(),task.getOperatingTimeInHours()/*" / "+task.getOperatingTime()*/});
+            model.addRow(new Object[]{task.getId(), checked[0]+"  "+task.getType(), task.displayInterval(), task.getSecteur()+" "+task.getName(), task.getLastMaintaintDate(), task.displayOperatingTime()});
         });        
         tble.setModel(model);
+        tble.setAutoCreateRowSorter(true);
     }
     
     private void buttonEquipmentInit() {
@@ -94,9 +102,9 @@ public class Accueil extends javax.swing.JFrame {
         boutons[1] = b2;
         boutons[2] = b3;
         boutons[3] = b4;
-        for( int i=0; i < EQUIPMENT_LIST.length; i++ ) {
+        for( int i=0; i < EQUIPMENT_LIST.length; i++ )
          boutons[i].setText(EQUIPMENT_LIST[i]);
-        }
+        
         b1.setText(boutons[0].getText());
         b1.setActionCommand(boutons[0].getText());
         b1.addActionListener(listener);
@@ -149,7 +157,6 @@ public class Accueil extends javax.swing.JFrame {
                                     btn1.setBackground(Color.white);
                                     btn1.setForeground(Color.black);
                                 }
-                                                    //System.out.println();
                         storageController = new StorageController(command); 
                         taskList = control.getAllEquipementTasks(EQUIPMENT_LIST[i]);
                         checked[0] = command;
@@ -172,43 +179,69 @@ public class Accueil extends javax.swing.JFrame {
                     if (command.equals(TASK_TYPE1)) {
                         if(!checked[1].equals(command))
                             for(JButton btn:buttons)
-                                if(btn.getText().equals(checked[1])){
+                                if(btn.getText().equals(checked[1])) {
                                     btn.setBackground(Color.black);
-                                    btn.setForeground(Color.white);                                }
+                                    btn.setForeground(Color.white);
+                                }
                                 else
                                     for(JButton btn1:buttons)
-                                        if(btn1.getText() == command){
+                                        if(btn1.getText() == command) {
                                             btn1.setBackground(Color.white);
                                             btn1.setForeground(Color.black);
                                         }
                         checked[1] = command;
-                        initTable();
+                        if(!taskListArranged.isEmpty())
+                            taskListArranged.clear();
+                        initTable(command);
                     }
                 }
                 System.out.println("action");
             }
         };
-        
-        tableListener = new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String command = e.getActionCommand();
-                
-            }
-        };
     }
     
+    private void showNotification(ArrayList<Notification> notificationList) {
+        notifModel = new DefaultTableModel();
+        notifModel.addColumn("Type");
+        notifModel.addColumn("Temps");
+        notifModel.addColumn("Messages");
+
+        if(!notificationList.isEmpty()){
+            notificationList.forEach((notification) -> {
+                if(notification.getType().equals("Alert"))
+                    alertNotification(notification);
+                else
+                    warningNotification(notification);
+            });
+            tble_alert.setAutoCreateRowSorter(true);
+            
+        }
+    }
     
-    private void notification() {
+    private void warningNotification(Notification notification){
+        System.out.println("Warning: "+notification.toString());
+        notifModel.addRow(new Object[]{ notification.getType(), notification.getCreatedAt(), notification.getMessage()});
+        //tble_alert.setModel(notifModel);
+       for(int i=0; i<3; i++)
+            tble_alert.getColumnModel().getColumn(i).setCellRenderer(new NotificationCellRenderer(tble_alert.getColumnName(i)));
+       main_pan.add(pan_alert);
+    }
     
+    private void alertNotification(Notification notification){
+        System.out.println("Alert: "+notification.toString());
+        notifModel.addRow(new Object[]{notification.getType(), notification.getCreatedAt(), notification.getMessage()});
+        tble_alert.setModel(notifModel);
+        for(int i=0; i<3; i++)
+            tble_alert.getColumnModel().getColumn(i).setCellRenderer(new NotificationCellRenderer(tble_alert.getColumnName(i)));
         main_pan.add(pan_alert);
-    
     }
     
     private void jbInit() throws Exception {
     
-        //desactivation des boutons liés aux taches
+        //recuperation de la liste des tâches
+        notificationList = new CustomFileReader().readFileDataNotification();
+        
+        //desactivation des boutons liés aux tâches
         boutons[0] = btn_help;
         boutons[1] = btn_history;
         boutons[2] = btn_unity;
@@ -219,7 +252,7 @@ public class Accueil extends javax.swing.JFrame {
         initListeners();
         buttonEquipmentInit();
         buttonActionInit();
-        //notification();
+        showNotification(notificationList);
         
         //desactivation des boutons d'action
         buttons[0] = ac1;
@@ -241,7 +274,6 @@ public class Accueil extends javax.swing.JFrame {
         }
     }
     
-    
     private void deplace(int i){
         try {
             elem[0] = model.getValueAt(i,0).toString();
@@ -255,6 +287,23 @@ public class Accueil extends javax.swing.JFrame {
             System.err.println(e);
             JOptionPane.showMessageDialog (null, "Erreur de Selection"+e.getLocalizedMessage());
         }
+    }
+    
+    private void arrangeTaskList(ArrayList<Task> taskList, String type){
+        taskList.forEach((task) -> {
+           if(task.getType().equals(type)){
+               this.taskListArranged.add(task);
+               System.out.println(type);
+               System.out.println("taskListArranged"+"\n"+this.taskListArranged.toString());
+               
+           }
+        });
+    }
+
+    private void clean(){
+        if(model != null)
+            while(model.getRowCount()>0) 
+                model.removeRow(0);
     }
     
     /**
@@ -274,7 +323,6 @@ public class Accueil extends javax.swing.JFrame {
         title_pan = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        jCheckBox1 = new javax.swing.JCheckBox();
         cls = new javax.swing.JButton();
         pan_btn3 = new javax.swing.JPanel();
         btn_help = new javax.swing.JButton();
@@ -359,24 +407,13 @@ public class Accueil extends javax.swing.JFrame {
         );
         title_panLayout.setVerticalGroup(
             title_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(title_panLayout.createSequentialGroup()
-                .addGroup(title_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(title_panLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(title_panLayout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, title_panLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, title_panLayout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
-
-        jCheckBox1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jCheckBox1.setText(" Muilti-Sélection");
-        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox1ActionPerformed(evt);
-            }
-        });
 
         cls.setBackground(new java.awt.Color(0, 0, 0));
         cls.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
@@ -453,17 +490,17 @@ public class Accueil extends javax.swing.JFrame {
             .addComponent(btn_help, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        tble.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        tble.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
         tble.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Dispositif", "Intervalle", "Article", "Dernière fois", "Temps [H]"
+                "#", "Dispositif", "Intervalle", "Article", "Dernière fois", "Temps [H]"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -471,7 +508,8 @@ public class Accueil extends javax.swing.JFrame {
             }
         });
         tble.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tble.setRowHeight(23);
+        tble.setOpaque(false);
+        tble.setRowHeight(30);
         tble.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tbleMouseClicked(evt);
@@ -479,11 +517,8 @@ public class Accueil extends javax.swing.JFrame {
         });
         jScrollPane3.setViewportView(tble);
         if (tble.getColumnModel().getColumnCount() > 0) {
-            tble.getColumnModel().getColumn(0).setResizable(false);
-            tble.getColumnModel().getColumn(1).setResizable(false);
-            tble.getColumnModel().getColumn(2).setResizable(false);
-            tble.getColumnModel().getColumn(3).setResizable(false);
-            tble.getColumnModel().getColumn(4).setResizable(false);
+            tble.getColumnModel().getColumn(0).setMaxWidth(20);
+            tble.getColumnModel().getColumn(5).setMaxWidth(100);
         }
 
         pan_btn2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Action", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 12))); // NOI18N
@@ -533,8 +568,8 @@ public class Accueil extends javax.swing.JFrame {
             .addGroup(pan_btn2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pan_btn2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pan_btn2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(ac1, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(pan_btn2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(ac1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(ac2, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(ac3, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -550,7 +585,7 @@ public class Accueil extends javax.swing.JFrame {
         );
         pan_CalLayout.setVerticalGroup(
             pan_CalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 212, Short.MAX_VALUE)
+            .addGap(0, 214, Short.MAX_VALUE)
         );
 
         pan_btn1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Emplacement", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 12))); // NOI18N
@@ -624,13 +659,14 @@ public class Accueil extends javax.swing.JFrame {
         );
 
         pan_alert.setBackground(new java.awt.Color(255, 255, 51));
+        pan_alert.setBorder(javax.swing.BorderFactory.createTitledBorder("Notifications"));
 
         tble_alert.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "     Temps", "    Messages    "
+                "     Type    ", "     Temps", "    Messages    "
             }
         ));
         jScrollPane4.setViewportView(tble_alert);
@@ -639,10 +675,7 @@ public class Accueil extends javax.swing.JFrame {
         pan_alert.setLayout(pan_alertLayout);
         pan_alertLayout.setHorizontalGroup(
             pan_alertLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pan_alertLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 555, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1295, Short.MAX_VALUE)
         );
         pan_alertLayout.setVerticalGroup(
             pan_alertLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -658,6 +691,10 @@ public class Accueil extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(main_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(main_panLayout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(pan_alert, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(main_panLayout.createSequentialGroup()
                         .addComponent(cls)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(pan_btn3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -668,39 +705,30 @@ public class Accueil extends javax.swing.JFrame {
                                 .addGroup(main_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(pan_btn1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(pan_btn2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 508, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(pan_Cal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap())
-                    .addGroup(main_panLayout.createSequentialGroup()
-                        .addComponent(jCheckBox1)
-                        .addGap(0, 0, Short.MAX_VALUE))))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, main_panLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(pan_alert, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(355, 355, 355))
+                        .addContainerGap())))
         );
         main_panLayout.setVerticalGroup(
             main_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(main_panLayout.createSequentialGroup()
                 .addComponent(title_pan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(main_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(main_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pan_Cal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(main_panLayout.createSequentialGroup()
                         .addComponent(pan_btn1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(20, 20, 20)
-                        .addComponent(pan_btn2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(pan_Cal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(2, 2, 2)
-                .addComponent(jCheckBox1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(pan_btn2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(10, 10, 10)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(main_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pan_btn3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cls, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pan_alert, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 18, Short.MAX_VALUE))
+                .addGap(0, 20, Short.MAX_VALUE))
         );
 
         getContentPane().add(main_pan);
@@ -731,17 +759,18 @@ public class Accueil extends javax.swing.JFrame {
 
     private void btn_doneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_doneActionPerformed
         // TODO add your handling code here:
-        new validate(storageController.getFileWriter().getFolderName(), elem[2]).setVisible(true);
+        new validate(this).setVisible(true);
     }//GEN-LAST:event_btn_doneActionPerformed
 
     private void btn_unityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_unityActionPerformed
         // TODO add your handling code here:
+        new Setting().setVisible(true);
     }//GEN-LAST:event_btn_unityActionPerformed
 
     private void btn_historyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_historyActionPerformed
         // TODO add your handling code here:
         
-        new history(storageController.getFileWriter(),storageController.getFileReader(), elem[2]).setVisible(true);
+        new history(storageController.getFileWriter(),storageController.getFileReader(), elem[0], elem[3]).setVisible(true);
     }//GEN-LAST:event_btn_historyActionPerformed
 
     private void btn_helpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_helpActionPerformed
@@ -751,8 +780,7 @@ public class Accueil extends javax.swing.JFrame {
 
     private void clsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clsActionPerformed
         // TODO add your handling code here:    
-        while(model.getRowCount()>0) 
-            model.removeRow(0);
+        clean();
         boutons[0] = btn_help;
         boutons[1] = btn_history;
         boutons[2] = btn_unity;
@@ -775,10 +803,6 @@ public class Accueil extends javax.swing.JFrame {
         checked[0] = "";
         checked[1] = "";
     }//GEN-LAST:event_clsActionPerformed
-
-    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jCheckBox1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
@@ -833,7 +857,7 @@ public class Accueil extends javax.swing.JFrame {
      * @param args the command line arguments
      **/
      
-/*
+
     public static void main(String args[]) {
         
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -842,8 +866,7 @@ public class Accueil extends javax.swing.JFrame {
             }
         });
         
-    }
-*/  
+    }  
    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -860,7 +883,6 @@ public class Accueil extends javax.swing.JFrame {
     private javax.swing.JButton btn_unity;
     private javax.swing.JButton cls;
     private javax.swing.JButton jButton2;
-    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;

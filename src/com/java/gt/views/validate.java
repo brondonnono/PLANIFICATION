@@ -5,30 +5,49 @@
  */
 package com.java.gt.views;
 
+import com.java.gt.beans.Task;
 import com.java.gt.store.CustomFileWriter;
+import java.util.ArrayList;
+import javax.swing.JFrame;
 /**
  *
  * @author Brondon Nono
  */
 public class validate extends javax.swing.JFrame {
 
-    public String[] data = {"","","",""};
+    public String[] data = {"","","","",""};
     private static String folderName;
     private static CustomFileWriter file;
+    private ArrayList<Task> taskList;
     /**
      * Creates new form validate
      */
     public validate() {
         
     }
-    
-    public validate(String folderName, String article){
-        data[3] = article;
-        this.folderName = folderName;
+    //storageController.getFileWriter().getFolderName(), elem[0], elem[3]
+    //String folderName, String id, String article
+    public validate(Accueil parent){
+        
+        data[0] = parent.elem[0];
+        data[1] = parent.elem[3];
+        
+        this.taskList = parent.taskList;
+        this.folderName = parent.storageController.getFileReader().getFolderName();
         initComponents();
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setResizable(false);
         setLocationRelativeTo(null);
+    }
+    
+    
+    private void reinitializeTask() {
+        this.taskList.forEach((task)-> {
+            if(task.getId() == Integer.parseInt(data[0]))
+                task.setOperatingTime(0);
+        });
+        System.out.println("list: "+taskList);
+        new CustomFileWriter(folderName).renderAllTasks(taskList);   
     }
 
     /**
@@ -182,13 +201,15 @@ public class validate extends javax.swing.JFrame {
     private void btn_okActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_okActionPerformed
         // TODO add your handling code here:
         try{
-            data[0] = date.getText();
-            data[1] = heure.getText();
-            data[2] = nomOp.getText();
+            data[2] = date.getText();
+            data[3] = nomOp.getText();
+            data[4] = heure.getText();
             for(String str:data)
                 System.out.println(str);
             file = new CustomFileWriter(folderName, data);
             file.saveData(data);
+            reinitializeTask();
+            System.out.println(taskList);
             dispose();
         }catch(Exception e){
             System.out.println(e.getMessage());
