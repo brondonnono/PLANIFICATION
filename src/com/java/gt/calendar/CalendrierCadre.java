@@ -8,6 +8,10 @@ import com.java.gt.views.Accueil;
 
 public class CalendrierCadre extends JFrame{
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
   Color oldColor = null;
   BoutonJour oldJour = null;
   Accueil pere;

@@ -5,6 +5,7 @@
  */
 package com.java.gt.views;
 import com.java.gt.beans.History;
+import com.java.gt.views.Setting;
 import com.java.gt.beans.Notification;
 import com.java.gt.beans.Task;
 import com.java.gt.calendar.CalendrierCadre;

@@ -6,6 +6,7 @@ import com.java.gt.beans.Equipment;
 import com.java.gt.beans.Task;
 import com.java.gt.controllers.beans_controllers.EquipmentController;
 import com.java.gt.controllers.store_controllers.StorageController;
+import com.java.gt.threads.MainThread;
 
 /**
  * @author Arléon Zemtsop
@@ -54,6 +55,8 @@ public class MainController {
             index++;
         }
         MainController.initEquipementTask();
+        MainThread mainThread = new MainThread(MainController.equipmentList.get(1).getStorageController());
+        mainThread.start();
     }
     
     public static void initCurrentTaskList(int indexEquip) {
