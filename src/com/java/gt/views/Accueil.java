@@ -29,6 +29,7 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JTable;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 /**
@@ -51,7 +52,7 @@ public class Accueil extends javax.swing.JFrame {
     public String[] checked = {"",""}, elem = {"","","","",""};
     private final static String title = "PLANIFICATION"; 
     public NotificationModel notificationModel = new NotificationModel();
-    public 
+    public JTable table;
         
              // control.init();
     
