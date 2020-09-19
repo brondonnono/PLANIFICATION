@@ -89,16 +89,17 @@ public class CustomFileReader {
         this.historyList.add(h);
     }
 
-    public void computeNotification(String[] attributeList, int index) {
+    public void computeNotification(String[] attributeList) {
         Date createdAt = null; 
         try {
-            createdAt = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(attributeList[0]);
+            createdAt = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(attributeList[2]);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        String message = attributeList[1];  
-        String type = attributeList[2];
-        Notification n = new Notification(index, createdAt, message, type);
+        int id = Integer.parseInt(attributeList[0]);
+        String type = attributeList[1];
+        String message = attributeList[3];  
+        Notification n = new Notification(id, type, createdAt, message);
         this.notificationList.add(n);
     }
      
@@ -154,16 +155,14 @@ public class CustomFileReader {
         Path path = Paths.get(fileName);
         try {
             if(!Files.readAllLines(path).isEmpty()) {      
-                int index = 1;
                 for(String line: Files.readAllLines(path)) {
                     String[] attributeList = line.split("-");
                     if(attributeList.length > 0) {
-                        this.computeNotification(attributeList, index);
+                        this.computeNotification(attributeList);
                     }
-                    index++;
                 }
-                for(Notification notif: this.notificationList)
-                    System.out.println("notification: " + notif.toString());
+    //            for(Notification notif: this.notificationList)
+   //                 System.out.println("notification: " + notif.toString());
                 return this.notificationList;
             }
         } catch(IOException e) {} 

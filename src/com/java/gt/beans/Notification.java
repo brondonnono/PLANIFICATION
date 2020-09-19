@@ -10,7 +10,7 @@ public class Notification {
 
     public Notification() {}
 
-    public Notification(int id, Date createdAt, String message, String type) {
+    public Notification(int id, String type, Date createdAt, String message) {
         this.id = id;
         this.createdAt = createdAt;
         this.message = message;
@@ -44,6 +44,6 @@ public class Notification {
 
     @Override
     public String toString() {
-        return "Notification [createdAt=" + createdAt + ", id=" + id + ", message=" + message + ", type="+ type +"]";
+        return "Notification [id=" + id + ", type="+ type +", message=" + message + ", createdAt=" + createdAt +"]";
     }
 }

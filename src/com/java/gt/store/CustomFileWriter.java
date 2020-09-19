@@ -1,5 +1,6 @@
 package com.java.gt.store;
 
+import com.java.gt.beans.Notification;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -58,8 +59,8 @@ public class CustomFileWriter {
         };
     }
     
-    public void saveNotificationData(String[] data) {
-        String line = this.computeFileLine(data);
+    public void saveNotificationData(Notification notif) {
+        String line = this.computeNotificationFileLine(notif);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.file.getAbsolutePath(), true))) {
             writer.write(line);
             writer.newLine();
@@ -93,8 +94,12 @@ public class CustomFileWriter {
         return data[0]+ "-" + data[1] + "-" + data[2]+ "-"+ data[3]+ "-"+ data[4];
     }
 
-    public String computeNotificationFileLine(String[] data) {
-        return data[0]+ "-" + data[1] + "-" + data[2];
+    public String computeNotificationFileLine(Notification notif) {
+        SimpleDateFormat DateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+        String createdAt= DateFormat.format(notif.getCreatedAt());
+        String line = notif.getId() + "-" + notif.getType() + "-" + createdAt 
+            + "-"+ notif.getMessage();
+        return line;
     }
 
     public void renderAllTasks(ArrayList<Task> newTaskList) {
@@ -102,6 +107,12 @@ public class CustomFileWriter {
         for(Task newTask: newTaskList) {
             this.saveTask(newTask);
         }
+    }
+    
+    public void renderAllNotifications(ArrayList<Notification> newNotificationList, File file){
+        this.reinitilaliseFile(file);
+        for(Notification newNotif: newNotificationList)
+            this.saveNotificationData(newNotif);
     }
 
     public void renderOperatingTime(int nbSecond, ArrayList<Task> taskList) {
@@ -123,15 +134,8 @@ public class CustomFileWriter {
     }
     
     public void reinitilaliseFile(File file) {
-        if(file.exists())
-            file.delete();
-        if(!file.exists()){
-            try {
-                file.createNewFile();
-            } catch(IOException e) {
-                e.printStackTrace();
-            }
-        }
+        this.file = file; 
+        reinitilaliseFile();
     }
 
     public String getFolderName() {

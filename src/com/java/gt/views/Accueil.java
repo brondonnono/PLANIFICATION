@@ -167,8 +167,7 @@ public class Accueil extends javax.swing.JFrame {
                         btnState(buttons, true);
                     }
                 }
-            }
-            
+            }  
         };
         
         actionListener = new ActionListener() {
@@ -203,6 +202,7 @@ public class Accueil extends javax.swing.JFrame {
     
     private void showNotification(ArrayList<Notification> notificationList) {
         notifModel = new DefaultTableModel();
+        notifModel.addColumn("Nº Tâche");
         notifModel.addColumn("Type");
         notifModel.addColumn("Temps");
         notifModel.addColumn("Messages");
@@ -221,21 +221,21 @@ public class Accueil extends javax.swing.JFrame {
     }
     
     private void warningNotification(Notification notification){
-        // System.out.println("Warning: "+notification.toString());
+        System.out.println("Warning: "+notification.toString());
         dt[0] = notification.getType();
-        notifModel.addRow(new Object[]{ notification.getType(), notification.getCreatedAt(), notification.getMessage()});
-        //tble_alert.setModel(notifModel);
-        for(int i=0; i<3; i++)
+        notifModel.addRow(new Object[]{notification.getId(), notification.getType(), notification.getCreatedAt(), notification.getMessage()});
+        tble_alert.setModel(notifModel);
+        for(int i=0; i<4; i++)
             tble_alert.getColumnModel().getColumn(i).setCellRenderer(new NotificationCellRenderer(tble_alert.getColumnName(i),dt));
         main_pan.add(pan_alert);
     }
     
     private void alertNotification(Notification notification){
-       // System.out.println("Alert: "+notification.toString());
+        System.out.println("Alert: "+notification.toString());
         dt[0] = notification.getType();
-        notifModel.addRow(new Object[]{notification.getType(), notification.getCreatedAt(), notification.getMessage()});
+        notifModel.addRow(new Object[]{notification.getId(), notification.getType(), notification.getCreatedAt(), notification.getMessage()});
         tble_alert.setModel(notifModel);
-        for(int i=0; i<3; i++)
+        for(int i=1; i<4; i++)
             tble_alert.getColumnModel().getColumn(i).setCellRenderer(new NotificationCellRenderer(tble_alert.getColumnName(i),dt));
                         
 //System.out.println(tble_alert.getColumnName(0));
@@ -379,6 +379,11 @@ public class Accueil extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setName("accueil"); // NOI18N
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                formMouseEntered(evt);
+            }
+        });
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.LINE_AXIS));
 
         main_pan.setBackground(new java.awt.Color(255, 255, 51));
@@ -397,7 +402,7 @@ public class Accueil extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Arial", 0, 36)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/java/gt/img/mini-logo.png"))); // NOI18N
-        jLabel1.setText("    PLANIFICATION");
+        jLabel1.setText("PLANIFICATION");
         jLabel1.setToolTipText("");
 
         javax.swing.GroupLayout title_panLayout = new javax.swing.GroupLayout(title_pan);
@@ -405,19 +410,21 @@ public class Accueil extends javax.swing.JFrame {
         title_panLayout.setHorizontalGroup(
             title_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, title_panLayout.createSequentialGroup()
-                .addGap(26, 26, 26)
+                .addGap(28, 28, 28)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 403, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24))
+                .addGap(21, 21, 21))
         );
         title_panLayout.setVerticalGroup(
             title_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(title_panLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(title_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(title_panLayout.createSequentialGroup()
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)))
         );
 
         cls.setBackground(new java.awt.Color(0, 0, 0));
@@ -521,10 +528,6 @@ public class Accueil extends javax.swing.JFrame {
             }
         });
         jScrollPane3.setViewportView(tble);
-        if (tble.getColumnModel().getColumnCount() > 0) {
-            tble.getColumnModel().getColumn(0).setMaxWidth(20);
-            tble.getColumnModel().getColumn(5).setMaxWidth(100);
-        }
 
         pan_btn2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Action", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 12))); // NOI18N
 
@@ -671,9 +674,10 @@ public class Accueil extends javax.swing.JFrame {
 
             },
             new String [] {
-                "     Type    ", "     Temps", "    Messages    "
+                "     Temps", "    Messages    "
             }
         ));
+        tble_alert.setEnabled(false);
         jScrollPane4.setViewportView(tble_alert);
 
         javax.swing.GroupLayout pan_alertLayout = new javax.swing.GroupLayout(pan_alert);
@@ -698,7 +702,7 @@ public class Accueil extends javax.swing.JFrame {
                     .addGroup(main_panLayout.createSequentialGroup()
                         .addGap(10, 10, 10)
                         .addComponent(pan_alert, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(0, 18, Short.MAX_VALUE))
                     .addGroup(main_panLayout.createSequentialGroup()
                         .addComponent(cls)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -718,7 +722,7 @@ public class Accueil extends javax.swing.JFrame {
             main_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(main_panLayout.createSequentialGroup()
                 .addComponent(title_pan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(main_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pan_Cal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(main_panLayout.createSequentialGroup()
@@ -733,7 +737,7 @@ public class Accueil extends javax.swing.JFrame {
                     .addComponent(cls, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pan_alert, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 19, Short.MAX_VALUE))
+                .addGap(0, 111, Short.MAX_VALUE))
         );
 
         getContentPane().add(main_pan);
@@ -741,57 +745,32 @@ public class Accueil extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void tbleMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbleMouseClicked
+    private void formMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseEntered
         // TODO add your handling code here:
-        try{
-            int i=tble.getSelectedRow();
-            deplace(i);
-       /*     while(model.getRowCount()>0) 
-                model.removeRow(0);
-            initTable();
-        */
+        try {
+            notificationList = new CustomFileReader().readFileDataNotification();
+            showNotification(notificationList);
+            
         }
-        catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Erreur de deplacement"+e.getLocalizedMessage());
+        catch(Exception e) {
+            e.printStackTrace();
         }
-        boutons[0] = btn_help;
-        boutons[1] = btn_history;
-        boutons[2] = btn_unity;
-        boutons[3] = btn_done;
-        btnState(boutons,true);
-    
-    }//GEN-LAST:event_tbleMouseClicked
+    }//GEN-LAST:event_formMouseEntered
 
-    private void btn_doneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_doneActionPerformed
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        new validate(this).setVisible(true);
-    }//GEN-LAST:event_btn_doneActionPerformed
-
-    private void btn_unityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_unityActionPerformed
-        // TODO add your handling code here:
-        new Setting().setVisible(true);
-    }//GEN-LAST:event_btn_unityActionPerformed
-
-    private void btn_historyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_historyActionPerformed
-        // TODO add your handling code here:
-        
-        new history(storageController.getFileWriter(),storageController.getFileReader(), elem[0], elem[3]).setVisible(true);
-    }//GEN-LAST:event_btn_historyActionPerformed
-
-    private void btn_helpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_helpActionPerformed
-        // TODO add your handling code here:
-        new Help(this).setVisible(true);
-    }//GEN-LAST:event_btn_helpActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     private void clsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clsActionPerformed
-        // TODO add your handling code here:    
+        // TODO add your handling code here:
         clean();
         boutons[0] = btn_help;
         boutons[1] = btn_history;
         boutons[2] = btn_unity;
         boutons[3] = btn_done;
         btnState(boutons,false);
-        
+
         for(JButton btn:buttons){
             btn.setBackground(Color.black);
             btn.setForeground(Color.white);
@@ -809,10 +788,62 @@ public class Accueil extends javax.swing.JFrame {
         checked[1] = "";
     }//GEN-LAST:event_clsActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btn_helpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_helpActionPerformed
         // TODO add your handling code here:
-        System.exit(0);
-    }//GEN-LAST:event_jButton2ActionPerformed
+        new Help(this).setVisible(true);
+    }//GEN-LAST:event_btn_helpActionPerformed
+
+    private void btn_historyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_historyActionPerformed
+        // TODO add your handling code here:
+
+        new history(storageController.getFileWriter(),storageController.getFileReader(), elem[0], elem[3]).setVisible(true);
+    }//GEN-LAST:event_btn_historyActionPerformed
+
+    private void btn_unityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_unityActionPerformed
+        // TODO add your handling code here:
+        new Setting().setVisible(true);
+    }//GEN-LAST:event_btn_unityActionPerformed
+
+    private void btn_doneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_doneActionPerformed
+        // TODO add your handling code here:
+        new validate(this).setVisible(true);
+    }//GEN-LAST:event_btn_doneActionPerformed
+
+    private void tbleMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbleMouseClicked
+        // TODO add your handling code here:
+        try{
+            int i=tble.getSelectedRow();
+            deplace(i);
+            /*     while(model.getRowCount()>0)
+            model.removeRow(0);
+            initTable();
+            */
+        }
+        catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Erreur de deplacement"+e.getLocalizedMessage());
+        }
+        boutons[0] = btn_help;
+        boutons[1] = btn_history;
+        boutons[2] = btn_unity;
+        boutons[3] = btn_done;
+        btnState(boutons,true);
+    }//GEN-LAST:event_tbleMouseClicked
+
+    private void ac2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ac2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ac2ActionPerformed
+
+    private void ac1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ac1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ac1ActionPerformed
+
+    private void ac3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ac3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ac3ActionPerformed
+
+    private void b1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_b1FocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_b1FocusLost
 
     private void b1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b1ActionPerformed
         // TODO add your handling code here:
@@ -829,22 +860,6 @@ public class Accueil extends javax.swing.JFrame {
     private void b4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b4ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_b4ActionPerformed
-
-    private void ac1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ac1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_ac1ActionPerformed
-
-    private void ac2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ac2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_ac2ActionPerformed
-
-    private void ac3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ac3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_ac3ActionPerformed
-
-    private void b1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_b1FocusLost
-        // TODO add your handling code here:
-    }//GEN-LAST:event_b1FocusLost
 
     /*Génération de button*/
     public void generate_btn(String name) {

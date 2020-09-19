@@ -5,8 +5,11 @@
  */
 package com.java.gt.views;
 
+import com.java.gt.beans.Notification;
 import com.java.gt.beans.Task;
+import com.java.gt.configurations.StorageConfig;
 import com.java.gt.store.CustomFileWriter;
+import java.io.File;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 /**
@@ -18,7 +21,8 @@ public class validate extends javax.swing.JFrame {
     public String[] data = {"","","","",""};
     private static String folderName;
     private static CustomFileWriter file;
-    private ArrayList<Task> taskList;
+    private ArrayList<Task> taskList = new ArrayList<Task>();
+    private ArrayList<Notification> notificationList = new ArrayList<Notification>(), newNotificationList = new ArrayList<Notification>();
     /**
      * Creates new form validate
      */
@@ -33,6 +37,7 @@ public class validate extends javax.swing.JFrame {
         data[1] = parent.elem[3];
         
         this.taskList = parent.taskList;
+        this.notificationList = parent.notificationList;
         this.folderName = parent.storageController.getFileReader().getFolderName();
         initComponents();
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -40,7 +45,18 @@ public class validate extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }
     
-    
+    private void ClearNotification(){
+        this.notificationList.forEach((notif) ->{
+            if(notif.getId() == Integer.parseInt(data[0])){
+                System.out.println("id :"+ notif.getId());
+            } else 
+                newNotificationList.add(notif);
+               // notificationList.remove(notif);
+        });
+        System.out.println("Notif new :"+ newNotificationList);
+        new CustomFileWriter().renderAllNotifications(newNotificationList, new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + StorageConfig.DEFAULT_NOTIFICATION_FILE_NAME));
+    }
+
     private void reinitializeTask() {
         this.taskList.forEach((task)-> {
             if(task.getId() == Integer.parseInt(data[0]))
@@ -209,12 +225,13 @@ public class validate extends javax.swing.JFrame {
             file = new CustomFileWriter(folderName, data);
             file.saveData(data);
             reinitializeTask();
-            System.out.println(taskList);
+            ClearNotification();
+            
+            //new Accueil().setVisible(true);
             dispose();
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
-//getContentPane().add(new JButton("cancel"));
     }//GEN-LAST:event_btn_okActionPerformed
 
     private void dateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dateActionPerformed

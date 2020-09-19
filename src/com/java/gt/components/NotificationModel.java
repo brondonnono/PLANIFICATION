@@ -18,7 +18,7 @@ import javax.swing.table.AbstractTableModel;
  */
 public class NotificationModel extends AbstractTableModel {
     
-        private final String[] entetes = {"Type", "Temps", "Messages" };
+        private final String[] entetes = {"Nº Tâche", "Type", "Temps", "Messages" };
         private ArrayList<Notification>  notificationList;
         
         public NotificationModel(){
@@ -48,30 +48,35 @@ public class NotificationModel extends AbstractTableModel {
 		// TODO Auto-generated method stub
 		switch (columnIndex) {
 
-                    case 0:     
-                            // Type
-                            return notificationList.get(rowIndex).getType();
-                            
-                    case 1:
-                            // Temps
-                            return notificationList.get(rowIndex).getCreatedAt();
+                    case 0:
+                        //id
+                        return notificationList.get(rowIndex).getId();
+                        
+                    case 1:     
+                        // Type
+                        return notificationList.get(rowIndex).getType();
 
                     case 2:
-                            // Messages
-                            return notificationList.get(rowIndex).getMessage();
+                        // Temps
+                        return notificationList.get(rowIndex).getCreatedAt();
+
+                    case 3:
+                        // Messages
+                        return notificationList.get(rowIndex).getMessage();
 
                     default:
-                            throw new IllegalArgumentException();
+                        throw new IllegalArgumentException();
                 }
 	}
         
         @Override
 	public Class<?> getColumnClass(int columnIndex) {
-		switch (columnIndex) {
-			case 1:
+		switch (columnIndex) {                            
+			case 2:
                             return Date.class;
-			case 0:
-                        case 2:
+                        case 0:
+                        case 1:    
+                        case 3:
                             return String.class;
 	
 			default:
