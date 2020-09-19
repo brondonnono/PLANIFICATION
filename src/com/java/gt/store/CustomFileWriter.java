@@ -33,7 +33,7 @@ public class CustomFileWriter {
         StorageConfig.createFolderIfNotExist(this.folder);
         StorageConfig.createFileIfNotExist(this.file);
     }
-
+    
     public CustomFileWriter(String[] data, String defaultFileName){
         this.file = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + defaultFileName);
         StorageConfig.createFileIfNotExist(this.file);
@@ -57,7 +57,7 @@ public class CustomFileWriter {
             e.printStackTrace();
         };
     }
-
+    
     public void saveNotificationData(String[] data) {
         String line = this.computeFileLine(data);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.file.getAbsolutePath(), true))) {
@@ -90,7 +90,7 @@ public class CustomFileWriter {
     }
     
     public String computeFileLine(String[] data) {
-        return data[3]+ "-" + data[0] + "-" + data[2]+ "-"+ data[1];
+        return data[0]+ "-" + data[1] + "-" + data[2]+ "-"+ data[3]+ "-"+ data[4];
     }
 
     public String computeNotificationFileLine(String[] data) {
