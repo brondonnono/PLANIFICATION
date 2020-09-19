@@ -49,7 +49,7 @@ public class Accueil extends javax.swing.JFrame {
     private final String[] EQUIPMENT_LIST = control.EQUIPMENT_LIST;
     public final String[] TASK_TYPE = new Task().TASK_TYPE_LABEL;
     public StorageController storageController;
-    public String[] checked = {"",""}, elem = {"","","","",""};
+    public String[] checked = {"",""}, elem = {"","","","",""}, dt = {"", "", ""};
     private final static String title = "PLANIFICATION"; 
     public NotificationModel notificationModel = new NotificationModel();
     public JTable table;
@@ -206,7 +206,8 @@ public class Accueil extends javax.swing.JFrame {
         notifModel.addColumn("Type");
         notifModel.addColumn("Temps");
         notifModel.addColumn("Messages");
-
+        table = new JTable(notificationModel);
+        //tble_alert = new JTable(notificationModel);
         if(!notificationList.isEmpty()){
             notificationList.forEach((notification) -> {
                 if(notification.getType().equals("Alert"))
@@ -220,20 +221,24 @@ public class Accueil extends javax.swing.JFrame {
     }
     
     private void warningNotification(Notification notification){
-        System.out.println("Warning: "+notification.toString());
+        // System.out.println("Warning: "+notification.toString());
+        dt[0] = notification.getType();
         notifModel.addRow(new Object[]{ notification.getType(), notification.getCreatedAt(), notification.getMessage()});
         //tble_alert.setModel(notifModel);
-       for(int i=0; i<3; i++)
-            tble_alert.getColumnModel().getColumn(i).setCellRenderer(new NotificationCellRenderer(tble_alert.getColumnName(i)));
-       main_pan.add(pan_alert);
+        for(int i=0; i<3; i++)
+            tble_alert.getColumnModel().getColumn(i).setCellRenderer(new NotificationCellRenderer(tble_alert.getColumnName(i),dt));
+        main_pan.add(pan_alert);
     }
     
     private void alertNotification(Notification notification){
-        System.out.println("Alert: "+notification.toString());
+       // System.out.println("Alert: "+notification.toString());
+        dt[0] = notification.getType();
         notifModel.addRow(new Object[]{notification.getType(), notification.getCreatedAt(), notification.getMessage()});
         tble_alert.setModel(notifModel);
         for(int i=0; i<3; i++)
-            tble_alert.getColumnModel().getColumn(i).setCellRenderer(new NotificationCellRenderer(tble_alert.getColumnName(i)));
+            tble_alert.getColumnModel().getColumn(i).setCellRenderer(new NotificationCellRenderer(tble_alert.getColumnName(i),dt));
+                        
+//System.out.println(tble_alert.getColumnName(0));
         main_pan.add(pan_alert);
     }
     
@@ -392,7 +397,7 @@ public class Accueil extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Arial", 0, 36)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/java/gt/img/mini-logo.png"))); // NOI18N
-        jLabel1.setText("PLANIFICATION");
+        jLabel1.setText("    PLANIFICATION");
         jLabel1.setToolTipText("");
 
         javax.swing.GroupLayout title_panLayout = new javax.swing.GroupLayout(title_pan);
@@ -400,20 +405,19 @@ public class Accueil extends javax.swing.JFrame {
         title_panLayout.setHorizontalGroup(
             title_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, title_panLayout.createSequentialGroup()
-                .addGap(28, 28, 28)
+                .addGap(26, 26, 26)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 403, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(20, 20, 20))
+                .addGap(24, 24, 24))
         );
         title_panLayout.setVerticalGroup(
             title_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, title_panLayout.createSequentialGroup()
+            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(title_panLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, title_panLayout.createSequentialGroup()
-                .addGap(10, 10, 10)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         cls.setBackground(new java.awt.Color(0, 0, 0));
@@ -714,7 +718,7 @@ public class Accueil extends javax.swing.JFrame {
             main_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(main_panLayout.createSequentialGroup()
                 .addComponent(title_pan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(main_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pan_Cal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(main_panLayout.createSequentialGroup()
@@ -729,7 +733,7 @@ public class Accueil extends javax.swing.JFrame {
                     .addComponent(cls, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pan_alert, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 20, Short.MAX_VALUE))
+                .addGap(0, 19, Short.MAX_VALUE))
         );
 
         getContentPane().add(main_pan);

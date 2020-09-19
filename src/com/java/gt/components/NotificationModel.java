@@ -8,6 +8,8 @@ package com.java.gt.components;
 import com.java.gt.beans.Notification;
 import com.java.gt.store.CustomFileReader;
 import java.util.ArrayList;
+import java.util.Date;
+import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -21,6 +23,7 @@ public class NotificationModel extends AbstractTableModel {
         
         public NotificationModel(){
             notificationList = new CustomFileReader().readFileDataNotification();
+            System.out.println("NotificationModel : "+ notificationList);
         }
 
 	@Override
@@ -65,13 +68,14 @@ public class NotificationModel extends AbstractTableModel {
         @Override
 	public Class<?> getColumnClass(int columnIndex) {
 		switch (columnIndex) {
-			case 0:
 			case 1:
+                            return Date.class;
+			case 0:
                         case 2:
-				return String.class;
+                            return String.class;
 	
 			default:
-				return Object.class;
+                            return Object.class;
 		}
 	}
 

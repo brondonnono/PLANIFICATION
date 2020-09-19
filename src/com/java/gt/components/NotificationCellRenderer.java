@@ -7,6 +7,7 @@ package com.java.gt.components;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.Date;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -17,22 +18,44 @@ import javax.swing.table.DefaultTableCellRenderer;
 public class NotificationCellRenderer extends DefaultTableCellRenderer {
     
     private String elem;
+    private  String[] dt = {"","",""};
     
-    public NotificationCellRenderer(String elem){
+    public NotificationCellRenderer(String elem, String[] dt){
         this.elem = elem;
+        this.dt = dt;
     }
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         
-        if(elem.equals("type")){
+        if(elem.equalsIgnoreCase("type")){
             String type = (String) value;
             setText(type);
-            if(type.equals("Warning"))
-                setBackground(Color.yellow);
             if(type.equals("Alert"))
                 setBackground(Color.red);
-        }
+            else
+                setBackground(Color.yellow);
+            
+        }/* else if(elem.equalsIgnoreCase("temps")) {
+                    System.out.println(elem);
+                    System.out.println(dt[0]);
+                    Date date = (Date) value;
+                    setText(date.toString());
+                    if(dt[0].equalsIgnoreCase("Alert"))
+                        setBackground(Color.red);
+                    else
+                        setBackground(Color.yellow);
+            } else if(elem.equalsIgnoreCase("Messages")){
+                    System.out.println(elem);
+                    System.out.println(dt[0]);
+                    String msg = (String) value;
+                    setText(msg);
+                    if(dt[0].equalsIgnoreCase("Alert"))
+                        setBackground(Color.red);
+                    else
+                        setBackground(Color.yellow);
+                }
+        */        
        
         return this;
     }
