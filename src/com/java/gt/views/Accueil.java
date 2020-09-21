@@ -161,10 +161,11 @@ public class Accueil extends javax.swing.JFrame {
                         storageController = new StorageController(command); 
                         taskList = control.getAllEquipementTasks(EQUIPMENT_LIST[i]);
                         checked[0] = command;
-                        buttons[0] = ac1;
-                        buttons[1] = ac2;
-                        buttons[2] = ac3;
-                        btnState(buttons, true);
+                        boutons[0] = ac1;
+                        boutons[1] = ac2;
+                        boutons[2] = ac3;
+                        boutons[3] = btn_history;
+                        btnState(boutons, true);
                     }
                 }
             }  
@@ -282,6 +283,7 @@ public class Accueil extends javax.swing.JFrame {
     
     private void deplace(int i){
         try {
+            elem = new String[5];
             elem[0] = model.getValueAt(i,0).toString();
             elem[1] = model.getValueAt(i,1).toString();
             elem[2] = model.getValueAt(i,2).toString();
@@ -310,6 +312,7 @@ public class Accueil extends javax.swing.JFrame {
         if(model != null)
             while(model.getRowCount()>0) 
                 model.removeRow(0);
+        elem = null;
     }
     
     /**
@@ -386,8 +389,6 @@ public class Accueil extends javax.swing.JFrame {
         });
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.LINE_AXIS));
 
-        main_pan.setBackground(new java.awt.Color(255, 255, 51));
-
         title_pan.setBackground(new java.awt.Color(0, 0, 0));
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/java/gt/img/exit.png"))); // NOI18N
@@ -436,8 +437,6 @@ public class Accueil extends javax.swing.JFrame {
                 clsActionPerformed(evt);
             }
         });
-
-        pan_btn3.setBackground(new java.awt.Color(255, 255, 51));
 
         btn_help.setBackground(new java.awt.Color(0, 0, 0));
         btn_help.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
@@ -666,7 +665,6 @@ public class Accueil extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        pan_alert.setBackground(new java.awt.Color(255, 255, 51));
         pan_alert.setBorder(javax.swing.BorderFactory.createTitledBorder("Notifications"));
 
         tble_alert.setModel(new javax.swing.table.DefaultTableModel(
@@ -796,7 +794,7 @@ public class Accueil extends javax.swing.JFrame {
     private void btn_historyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_historyActionPerformed
         // TODO add your handling code here:
 
-        new history(storageController.getFileWriter(),storageController.getFileReader(), elem[0], elem[3]).setVisible(true);
+        new HistoryView(this).setVisible(true);
     }//GEN-LAST:event_btn_historyActionPerformed
 
     private void btn_unityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_unityActionPerformed

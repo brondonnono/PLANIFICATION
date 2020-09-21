@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>C:\Users\Ordinateur\Documents\NetBeansProjects\PLANIFICATION\dist\PLANIFICATION.jar</jar>
+  <outfile>C:\Users\Ordinateur\Desktop\Planification.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir></chdir>
+  <priority>high</priority>
+  <downloadUrl></downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>true</stayAlive>
+  <restartOnCrash>true</restartOnCrash>
+  <manifest></manifest>
+  <icon>C:\Users\Ordinateur\Documents\NetBeansProjects\PLANIFICATION\src\com\java\gt\img\icon.ico</icon>
+  <jre>
+    <path></path>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <bundledJreAsFallback>false</bundledJreAsFallback>
+    <minVersion>8</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
+  </jre>
+  <splash>
+    <file>C:\Users\Ordinateur\Documents\NetBeansProjects\PLANIFICATION\src\com\java\gt\img\logo-splashscreen.bmp</file>
+    <waitForWindow>true</waitForWindow>
+    <timeout>60</timeout>
+    <timeoutErr>true</timeoutErr>
+  </splash>
+  <versionInfo>
+    <fileVersion>1.0.0.3</fileVersion>
+    <txtFileVersion>1.03.GT4</txtFileVersion>
+    <fileDescription>PLANIFICATION  DES TACHES DE MAINTENANCE</fileDescription>
+    <copyright>TEAM 4G&apos;&apos; © All Right Reserved </copyright>
+    <productVersion>1.0.0.0</productVersion>
+    <txtProductVersion>1.03.GT4</txtProductVersion>
+    <productName>PLANIFICATION</productName>
+    <companyName>TEAM 4G&apos;&apos;</companyName>
+    <internalName>PLANIFICATION</internalName>
+    <originalFilename>PLANIFICATION.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>FRENCH</language>
+  </versionInfo>
+  <messages>
+    <startupErr>An error occured while starting the application.
+Please Restart the application.
+
+If the problem persist contact the TEAM 4G&apos;&apos; with error code 404x4gx2dSt</startupErr>
+    <bundledJreErr>This application was configured to use a bundled Java Runtime Environment but the runtime is missing or corrupted.</bundledJreErr>
+    <jreVersionErr>This application requires a Java Runtime Environment</jreVersionErr>
+    <launcherErr>The registry refers to a nonexistent Java Runtime Environment installation or the runtime is corrupted.</launcherErr>
+    <instanceAlreadyExistsMsg>An application instance is already running.</instanceAlreadyExistsMsg>
+  </messages>
+</launch4jConfig>

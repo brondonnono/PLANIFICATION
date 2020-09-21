@@ -1,5 +1,6 @@
 package com.java.gt.store;
 
+import com.java.gt.beans.History;
 import com.java.gt.beans.Notification;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -81,6 +82,18 @@ public class CustomFileWriter {
         };
     }
 
+    public void saveData(History history) {
+        String line = this.computeFileLine(history);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.file.getAbsolutePath(), true))) {
+            writer.write(line);
+            writer.newLine();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        };
+    }    
+
+
     public String computeFileLine(Task task) {
         SimpleDateFormat DateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
         String lastMaintaintDate= DateFormat.format(task.getLastMaintaintDate());
@@ -91,7 +104,13 @@ public class CustomFileWriter {
     }
     
     public String computeFileLine(String[] data) {
-        return data[0]+ "-" + data[1] + "-" + data[2]+ "-"+ data[3]+ "-"+ data[4];
+        return data[0]+ "-" + data[1] + "-" + data[2]+ "-"+ data[3];
+    }
+    public String computeFileLine(History history) {
+        SimpleDateFormat DateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+        String date = DateFormat.format(history.getDate());
+        String line = history.getId()+ "-" + history.getArticle()+ "-" + date + "-" +history.getOperator();
+        return line;
     }
 
     public String computeNotificationFileLine(Notification notif) {
@@ -107,6 +126,12 @@ public class CustomFileWriter {
         for(Task newTask: newTaskList) {
             this.saveTask(newTask);
         }
+    }
+
+    public void renderAllHistory(ArrayList<History> newHistoryList, File file){
+        this.reinitilaliseFile(file);
+        for(History newHistory: newHistoryList)
+            this.saveData(newHistory);
     }
     
     public void renderAllNotifications(ArrayList<Notification> newNotificationList, File file){

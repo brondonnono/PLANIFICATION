@@ -78,14 +78,16 @@ public class CustomFileReader {
     
     public void computeHistory(String[] attributeList) {
 
-        
+        Date date = null;
         int id = Integer.parseInt(attributeList[0]);
         String article = attributeList[1];   
         System.out.println("article: "+article);
-        String date = attributeList[2];
+        try{
+            date = new SimpleDateFormat("dd/MM/yyyy hh:mm").parse(attributeList[2]);
+        }catch(ParseException e){}
+        //String date = attributeList[2];
         String operator = attributeList[3];
-        String hour =  attributeList[4];
-        History h = new History(id, article, date, operator, hour);
+        History h = new History(id, article, date, operator);
         this.historyList.add(h);
     }
 
@@ -134,13 +136,29 @@ public class CustomFileReader {
         Path path = Paths.get(fileName);
         try {
             if(!Files.readAllLines(path).isEmpty()) {      
-                int index = 1;
                 for(String line: Files.readAllLines(path)) {
                     String[] attributeList = line.split("-");
                     if(attributeList.length > 0) {
                         this.computeHistory(attributeList);
                     }
-                    index++;
+                }
+                for(History hist:historyList)
+            System.out.println("history: "+hist);
+                return this.historyList;
+            }
+        } catch(IOException e) {} 
+        return new ArrayList<History>();
+    }
+    public ArrayList<History> readFileDataHistory(File file) {
+        String fileName = file.getAbsolutePath();
+        Path path = Paths.get(fileName);
+        try {
+            if(!Files.readAllLines(path).isEmpty()) {      
+                for(String line: Files.readAllLines(path)) {
+                    String[] attributeList = line.split("-");
+                    if(attributeList.length > 0) {
+                        this.computeHistory(attributeList);
+                    }
                 }
                 for(History hist:historyList)
             System.out.println("article history: "+hist.getArticle());
@@ -149,7 +167,7 @@ public class CustomFileReader {
         } catch(IOException e) {} 
         return new ArrayList<History>();
     }
-        
+    
     public ArrayList<Notification> readFileDataNotification() {
         String fileName = this.notificationsFile.getAbsolutePath();
         Path path = Paths.get(fileName);
@@ -198,12 +216,20 @@ public class CustomFileReader {
     }
     
     public ArrayList<History> getHistoryList() {
-        System.out.println("getHistoryList :\n"+ historyList);
+        //System.out.println("getHistoryList :\n"+ historyList);
         return historyList;
     }
     
     public void setHistoryList(ArrayList<History> historyList) {
         this.historyList = historyList;
+    }
+    
+    public File getFileHistory() {
+        return fileHistory;
+    }
+
+    public void setFileHistory(File fileHistory) {
+        this.fileHistory = fileHistory;
     }
     
     public ArrayList<Notification> getNotificationList() {

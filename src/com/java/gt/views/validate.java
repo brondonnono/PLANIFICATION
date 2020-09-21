@@ -5,6 +5,7 @@
  */
 package com.java.gt.views;
 
+import com.java.gt.beans.History;
 import com.java.gt.beans.Notification;
 import com.java.gt.beans.Task;
 import com.java.gt.configurations.StorageConfig;
@@ -173,7 +174,7 @@ public class validate extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(16, 16, 16)
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(16, 16, 16))
         );
 
@@ -193,7 +194,7 @@ public class validate extends javax.swing.JFrame {
             main_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(main_panLayout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(27, 27, 27)
+                .addGap(35, 35, 35)
                 .addComponent(pan_data, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btn_ok, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -219,11 +220,12 @@ public class validate extends javax.swing.JFrame {
         try{
             data[2] = date.getText();
             data[3] = nomOp.getText();
-            data[4] = heure.getText();
+            data[2] = data[2]+" "+heure.getText();
             for(String str:data)
                 System.out.println(str);
             file = new CustomFileWriter(folderName, data);
-            file.saveData(data);
+            
+            file.saveData(new History(Integer.parseInt(data[0]), data[1], data[2], data[3]));
             reinitializeTask();
             ClearNotification();
             
