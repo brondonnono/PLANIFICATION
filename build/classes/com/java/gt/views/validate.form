@@ -160,12 +160,19 @@
             </Component>
             <Component class="javax.swing.JTextField" name="date">
               <Events>
+                <EventHandler event="caretUpdate" listener="javax.swing.event.CaretListener" parameters="javax.swing.event.CaretEvent" handler="dateCaretUpdate"/>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dateActionPerformed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="heure">
+              <Events>
+                <EventHandler event="caretUpdate" listener="javax.swing.event.CaretListener" parameters="javax.swing.event.CaretEvent" handler="heureCaretUpdate"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="nomOp">
+              <Events>
+                <EventHandler event="caretUpdate" listener="javax.swing.event.CaretListener" parameters="javax.swing.event.CaretEvent" handler="nomOpCaretUpdate"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

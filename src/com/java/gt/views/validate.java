@@ -47,6 +47,7 @@ public class validate extends javax.swing.JFrame {
         setResizable(false);
         setLocationRelativeTo(null);
         setIconImage((new ImageIcon(getClass().getResource("/com/java/gt/img/logo.png"))).getImage());
+        btn_ok.setEnabled(false);
     }
     
     private void ClearNotification(){
@@ -112,9 +113,26 @@ public class validate extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel6.setText("Heure au format (hh:mm) :");
 
+        date.addCaretListener(new javax.swing.event.CaretListener() {
+            public void caretUpdate(javax.swing.event.CaretEvent evt) {
+                dateCaretUpdate(evt);
+            }
+        });
         date.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dateActionPerformed(evt);
+            }
+        });
+
+        heure.addCaretListener(new javax.swing.event.CaretListener() {
+            public void caretUpdate(javax.swing.event.CaretEvent evt) {
+                heureCaretUpdate(evt);
+            }
+        });
+
+        nomOp.addCaretListener(new javax.swing.event.CaretListener() {
+            public void caretUpdate(javax.swing.event.CaretEvent evt) {
+                nomOpCaretUpdate(evt);
             }
         });
 
@@ -237,9 +255,33 @@ public class validate extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btn_okActionPerformed
 
+    private void StateVerification(){
+        if(!date.getText().trim().equals("")&&!heure.getText().trim().equals("")&&!nomOp.getText().trim().equals(""))
+            btn_ok.setEnabled(true);
+        else
+            btn_ok.setEnabled(false);
+    }
+
+    
+    
     private void dateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dateActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_dateActionPerformed
+
+    private void dateCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_dateCaretUpdate
+        // TODO add your handling code here:
+        StateVerification();
+    }//GEN-LAST:event_dateCaretUpdate
+
+    private void heureCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_heureCaretUpdate
+        // TODO add your handling code here:
+        StateVerification();
+    }//GEN-LAST:event_heureCaretUpdate
+
+    private void nomOpCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_nomOpCaretUpdate
+        // TODO add your handling code here:
+        StateVerification();
+    }//GEN-LAST:event_nomOpCaretUpdate
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
