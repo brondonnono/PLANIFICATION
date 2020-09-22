@@ -3,7 +3,9 @@ package com.java.gt.controllers.store_controllers;
 import com.java.gt.beans.History;
 import com.java.gt.beans.Task;
 import com.java.gt.store.CustomFileReader;
+import com.java.gt.store.CustomFileReaderHistory;
 import com.java.gt.store.CustomFileWriter;
+import com.java.gt.store.CustomFileWriterHistory;
 import java.util.ArrayList;
 
 /**
@@ -19,6 +21,9 @@ public class StorageController {
     private CustomFileReader fileReader;
     // Module d'écriture dans le fichier de tâches
     private CustomFileWriter fileWriter;
+    
+    private CustomFileReaderHistory fileReaderHistory;
+    private CustomFileWriterHistory fileWriterHistory;
     private String folderName;
     
     // Définition de la liste des tâches qui seront lues dépuis le fichier
@@ -41,8 +46,11 @@ public class StorageController {
         this.folderName = folderName;
         this.fileReader = new CustomFileReader(folderName);
         this.taskList = new ArrayList<Task>();
-       this.taskList = this.fileReader.readFileData();
-       this.fileWriter = new CustomFileWriter(folderName);
+        this.taskList = this.fileReader.readFileData();
+        this.fileWriter = new CustomFileWriter(folderName);
+        this.fileReaderHistory = new CustomFileReaderHistory(folderName);
+        this.fileWriterHistory = new CustomFileWriterHistory(folderName);
+        this.historyList = this.fileReaderHistory.getHistoryList();
     }
 
     // Définitions des getters and setters
@@ -74,8 +82,21 @@ public class StorageController {
     return taskList;
     }
 
-    @Override
-    public String toString() {
-        return "StorageController{" + "fileReader=" + fileReader + ", fileWriter=" + fileWriter + ", folderName=" + folderName + '}';
+    public CustomFileReaderHistory getFileReaderHistory() {
+        return fileReaderHistory;
     }
+
+    public void setFileReaderHistory(CustomFileReaderHistory fileReaderHistory) {
+        this.fileReaderHistory = fileReaderHistory;
+    }
+    
+    public CustomFileWriterHistory getFileWriterHistory() {
+        return fileWriterHistory;
+    }
+
+    public void setFileWriterHistory(CustomFileWriterHistory fileWriterHistory) {
+        this.fileWriterHistory = fileWriterHistory;
+    }
+    
+
 }

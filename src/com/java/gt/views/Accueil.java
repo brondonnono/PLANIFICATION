@@ -13,6 +13,7 @@ import com.java.gt.components.NotificationModel;
 import com.java.gt.controllers.MainController;
 import com.java.gt.controllers.store_controllers.StorageController;
 import com.java.gt.store.CustomFileReader;
+import com.java.gt.threads.TbleThread;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -38,21 +39,23 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Accueil extends javax.swing.JFrame {
     
-    private final static int nb = 4, n = 3;
+    private final static int nb = 4, n = 3, na = 5;
+    private int ligneSelected;
     private CalendrierCadre calend;
     private ActionListener listener, actionListener;
-    private JButton[] boutons = new JButton[nb], buttons = new JButton[n];
+    private JButton[] boutons = new JButton[nb], buttons = new JButton[n], taskButtons = new JButton[na];
     private DefaultTableModel model, notifModel;
     private MainController control = new MainController();
     public ArrayList<Task> taskList = new ArrayList<Task>(), taskListArranged = new ArrayList<Task>();
     public ArrayList<Notification> notificationList = new ArrayList<Notification>();
     private final String[] EQUIPMENT_LIST = control.EQUIPMENT_LIST;
     public final String[] TASK_TYPE = new Task().TASK_TYPE_LABEL;
-    public StorageController storageController;
+    public StorageController storageController = new StorageController();
     public String[] checked = {"",""}, elem = {"","","","",""}, dt = {"", "", ""};
     private final static String title = "PLANIFICATION"; 
     public NotificationModel notificationModel = new NotificationModel();
     public JTable table;
+    public static boolean canRead = false;
         
              // control.init();
     
@@ -76,7 +79,7 @@ public class Accueil extends javax.swing.JFrame {
         }
     }
 
-    private void initTable(String type) {
+    public void initTable(String type) {
    
         model= new DefaultTableModel();
         
@@ -87,14 +90,19 @@ public class Accueil extends javax.swing.JFrame {
         model.addColumn("Dernière fois");
         model.addColumn("Temps [H]");
         
-        this.taskList = storageController.getFileReader().getTaskList();
-        arrangeTaskList(taskList,type);
-        this.taskListArranged.forEach((task) -> {
-            System.out.println(task);
-            model.addRow(new Object[]{task.getId(), checked[0]+"  "+task.getType(), task.displayInterval(), task.getSecteur()+" "+task.getName(), task.getLastMaintaintDate(), task.displayOperatingTime()});
-        });        
-        tble.setModel(model);
-        tble.setAutoCreateRowSorter(true);
+        if(canRead){
+            this.taskList = storageController.getFileReader().getTaskList();
+            if(taskList != null){
+               // if(!taskList.isEmpty())
+                arrangeTaskList(taskList,type);
+                this.taskListArranged.forEach((task) -> {
+                    //System.out.println(task);
+                    model.addRow(new Object[]{task.getId(), checked[0]+"  "+task.getType(), task.displayInterval(), task.getSecteur()+" "+task.getName(), task.getLastMaintaintDate(), task.displayOperatingTime()});
+                });        
+                tble.setModel(model);
+                tble.setAutoCreateRowSorter(true);
+            }
+        }
     }
     
     private void buttonEquipmentInit() {
@@ -158,14 +166,23 @@ public class Accueil extends javax.swing.JFrame {
                                     btn1.setBackground(Color.white);
                                     btn1.setForeground(Color.black);
                                 }
-                        storageController = new StorageController(command); 
+                       // storageController = new StorageController(command);
+                       MainController.equipmentList.forEach((equipment) ->{
+                           if(equipment.getStorageController().getFolderName().equals(command)){
+                               storageController = equipment.getStorageController();
+                               canRead = true;
+                               //System.out.println("StorageController");
+                            }   
+                       });
                         taskList = control.getAllEquipementTasks(EQUIPMENT_LIST[i]);
                         checked[0] = command;
-                        boutons[0] = ac1;
-                        boutons[1] = ac2;
-                        boutons[2] = ac3;
-                        boutons[3] = btn_history;
-                        btnState(boutons, true);
+                        checked[1] = "";
+                        taskButtons[0] = ac1;
+                        taskButtons[1] = ac2;
+                        taskButtons[2] = ac3;
+                        taskButtons[3] = btn_history;
+                        taskButtons[4] = btn_addTask;
+                        btnState(taskButtons, true);
                     }
                 }
             }  
@@ -196,7 +213,7 @@ public class Accueil extends javax.swing.JFrame {
                         initTable(command);
                     }
                 }
-                System.out.println("action");
+                //System.out.println("action");
             }
         };
     }
@@ -249,11 +266,12 @@ public class Accueil extends javax.swing.JFrame {
         notificationList = new CustomFileReader().readFileDataNotification();
         
         //desactivation des boutons liés aux tâches
-        boutons[0] = btn_help;
-        boutons[1] = btn_history;
-        boutons[2] = btn_unity;
-        boutons[3] = btn_done;
-        btnState(boutons,false);
+        taskButtons[0] = btn_help;
+        taskButtons[1] = btn_history;
+        taskButtons[2] = btn_addTask;
+        taskButtons[3] = btn_done;
+        taskButtons[4] = btn_dropTask;
+        btnState(taskButtons,false);
         
         calend = new CalendrierCadre(this);
         initListeners();
@@ -266,6 +284,8 @@ public class Accueil extends javax.swing.JFrame {
         buttons[1] = ac2;
         buttons[2] = ac3;
         btnState(buttons, false);
+        
+        new TbleThread(this).start();
     } 
     
     public void btnState(JButton[] btn, boolean state) {
@@ -297,15 +317,24 @@ public class Accueil extends javax.swing.JFrame {
         }
     }
     
-    private void arrangeTaskList(ArrayList<Task> taskList, String type){
+    public void arrangeTaskList(ArrayList<Task> taskList, String type){
         taskList.forEach((task) -> {
            if(task.getType().equals(type)){
                this.taskListArranged.add(task);
-               System.out.println(type);
-               System.out.println("taskListArranged"+"\n"+this.taskListArranged.toString());
+               //System.out.println(type);
+               //System.out.println("taskListArranged"+"\n"+this.taskListArranged.toString());
                
            }
         });
+    }
+    
+    public ArrayList<Task> arrangedTaskList(ArrayList<Task> taskList, String type){
+        ArrayList<Task> taskListArranged = new ArrayList<Task>();
+        taskList.forEach((task) -> {
+           if(task.getType().equals(type))
+               taskListArranged.add(task);
+        });
+        return taskListArranged;
     }
 
     private void clean(){
@@ -313,6 +342,31 @@ public class Accueil extends javax.swing.JFrame {
             while(model.getRowCount()>0) 
                 model.removeRow(0);
         elem = null;
+    }
+    
+    private boolean removeTask(int indexTask){
+        Task t = this.storageController.getFileReader().getTaskList().remove(indexTask);
+        if(t==null)
+            return false;
+        return true;
+    }
+    
+    private void dropTask(){
+        int reply = JOptionPane.showConfirmDialog(null, "Voulez-vous vraiment supprimer cette tâche ?", "Confirmation Suppression", JOptionPane.YES_NO_OPTION);
+        if (reply == JOptionPane.YES_OPTION) {
+            if(this.removeTask(Integer.parseInt(elem[0])-1)){
+                //.addRow(new Object[]{task.getId(), box_folder.getSelectedItem().toString()+"  "+task.getType(), task.displayInterval(), task.getSecteur()+" "+task.getName(), task.getLastMaintaintDate(), task.displayOperatingTime()});
+                model.removeRow(ligneSelected);
+                model.fireTableDataChanged();
+                JOptionPane.showMessageDialog(null, "Tâche supprimée");
+            } else
+                JOptionPane.showMessageDialog(null, "Echec de suppression");
+        } else {
+            JOptionPane.showMessageDialog(null, "Suppression annulée");
+        }
+        
+        
+        
     }
     
     /**
@@ -336,8 +390,9 @@ public class Accueil extends javax.swing.JFrame {
         pan_btn3 = new javax.swing.JPanel();
         btn_help = new javax.swing.JButton();
         btn_history = new javax.swing.JButton();
-        btn_unity = new javax.swing.JButton();
         btn_done = new javax.swing.JButton();
+        btn_addTask = new javax.swing.JButton();
+        btn_dropTask = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         tble = new javax.swing.JTable();
         pan_btn2 = new javax.swing.JPanel();
@@ -458,16 +513,6 @@ public class Accueil extends javax.swing.JFrame {
             }
         });
 
-        btn_unity.setBackground(new java.awt.Color(0, 0, 0));
-        btn_unity.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
-        btn_unity.setForeground(new java.awt.Color(255, 255, 255));
-        btn_unity.setText("Chaque Unité");
-        btn_unity.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_unityActionPerformed(evt);
-            }
-        });
-
         btn_done.setBackground(new java.awt.Color(0, 0, 0));
         btn_done.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         btn_done.setForeground(new java.awt.Color(255, 255, 255));
@@ -478,30 +523,53 @@ public class Accueil extends javax.swing.JFrame {
             }
         });
 
+        btn_addTask.setBackground(new java.awt.Color(0, 0, 0));
+        btn_addTask.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btn_addTask.setForeground(new java.awt.Color(255, 255, 255));
+        btn_addTask.setText("Ajouter une tâche");
+        btn_addTask.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_addTaskActionPerformed(evt);
+            }
+        });
+
+        btn_dropTask.setBackground(new java.awt.Color(0, 0, 0));
+        btn_dropTask.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        btn_dropTask.setForeground(new java.awt.Color(255, 255, 255));
+        btn_dropTask.setText("Supprimer une tâche");
+        btn_dropTask.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_dropTaskActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pan_btn3Layout = new javax.swing.GroupLayout(pan_btn3);
         pan_btn3.setLayout(pan_btn3Layout);
         pan_btn3Layout.setHorizontalGroup(
             pan_btn3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pan_btn3Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(24, Short.MAX_VALUE)
+                .addComponent(btn_dropTask)
+                .addGap(18, 18, 18)
                 .addComponent(btn_help, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btn_history, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btn_unity, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btn_addTask)
                 .addGap(18, 18, 18)
                 .addComponent(btn_done, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         pan_btn3Layout.setVerticalGroup(
             pan_btn3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(btn_unity, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE)
-            .addComponent(btn_done, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(pan_btn3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(btn_done, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE)
+                .addComponent(btn_addTask, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE))
             .addComponent(btn_history, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(btn_dropTask, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(btn_help, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        tble.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
         tble.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -697,24 +765,22 @@ public class Accueil extends javax.swing.JFrame {
             .addGroup(main_panLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(main_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3)
+                    .addGroup(main_panLayout.createSequentialGroup()
+                        .addGroup(main_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(pan_btn1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(pan_btn2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(pan_Cal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(main_panLayout.createSequentialGroup()
                         .addGap(10, 10, 10)
                         .addComponent(pan_alert, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 18, Short.MAX_VALUE))
+                        .addGap(0, 8, Short.MAX_VALUE))
                     .addGroup(main_panLayout.createSequentialGroup()
                         .addComponent(cls)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(pan_btn3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(main_panLayout.createSequentialGroup()
-                        .addGroup(main_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane3)
-                            .addGroup(main_panLayout.createSequentialGroup()
-                                .addGroup(main_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(pan_btn1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(pan_btn2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(pan_Cal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap())))
+                        .addComponent(pan_btn3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         main_panLayout.setVerticalGroup(
             main_panLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -735,7 +801,7 @@ public class Accueil extends javax.swing.JFrame {
                     .addComponent(cls, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pan_alert, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 111, Short.MAX_VALUE))
+                .addContainerGap(70, Short.MAX_VALUE))
         );
 
         getContentPane().add(main_pan);
@@ -763,11 +829,12 @@ public class Accueil extends javax.swing.JFrame {
     private void clsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clsActionPerformed
         // TODO add your handling code here:
         clean();
-        boutons[0] = btn_help;
-        boutons[1] = btn_history;
-        boutons[2] = btn_unity;
-        boutons[3] = btn_done;
-        btnState(boutons,false);
+        taskButtons[0] = btn_help;
+        taskButtons[1] = btn_history;
+        taskButtons[2] = btn_addTask;
+        taskButtons[3] = btn_done;
+        taskButtons[4] = btn_dropTask;
+        btnState(taskButtons,false);
 
         for(JButton btn:buttons){
             btn.setBackground(Color.black);
@@ -793,14 +860,13 @@ public class Accueil extends javax.swing.JFrame {
 
     private void btn_historyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_historyActionPerformed
         // TODO add your handling code here:
-
         new HistoryView(this).setVisible(true);
     }//GEN-LAST:event_btn_historyActionPerformed
 
-    private void btn_unityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_unityActionPerformed
+    private void btn_addTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addTaskActionPerformed
         // TODO add your handling code here:
-        new Setting().setVisible(true);
-    }//GEN-LAST:event_btn_unityActionPerformed
+        new TaskDefinition(this).setVisible(true);
+    }//GEN-LAST:event_btn_addTaskActionPerformed
 
     private void btn_doneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_doneActionPerformed
         // TODO add your handling code here:
@@ -810,8 +876,8 @@ public class Accueil extends javax.swing.JFrame {
     private void tbleMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbleMouseClicked
         // TODO add your handling code here:
         try{
-            int i=tble.getSelectedRow();
-            deplace(i);
+            ligneSelected=tble.getSelectedRow();
+            deplace(ligneSelected);
             /*     while(model.getRowCount()>0)
             model.removeRow(0);
             initTable();
@@ -820,11 +886,12 @@ public class Accueil extends javax.swing.JFrame {
         catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Erreur de deplacement"+e.getLocalizedMessage());
         }
-        boutons[0] = btn_help;
-        boutons[1] = btn_history;
-        boutons[2] = btn_unity;
-        boutons[3] = btn_done;
-        btnState(boutons,true);
+        taskButtons[0] = btn_help;
+        taskButtons[1] = btn_history;
+        taskButtons[2] = btn_addTask;
+        taskButtons[3] = btn_done;
+        taskButtons[4] = btn_dropTask;
+        btnState(taskButtons,true);
     }//GEN-LAST:event_tbleMouseClicked
 
     private void ac2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ac2ActionPerformed
@@ -859,6 +926,11 @@ public class Accueil extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_b4ActionPerformed
 
+    private void btn_dropTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_dropTaskActionPerformed
+        // TODO add your handling code here:
+        dropTask();
+    }//GEN-LAST:event_btn_dropTaskActionPerformed
+
     /*Génération de button*/
     public void generate_btn(String name) {
         
@@ -867,7 +939,7 @@ public class Accueil extends javax.swing.JFrame {
         /*Masquage du tableau et reaffichage*/
     public void show_hide_table(java.awt.event.ActionEvent evt) {
        String a = evt.getActionCommand();
-       System.out.println(a);
+       //System.out.println(a);
         //JOptionPane.showMessageDialog(null, a);
     }
     
@@ -895,10 +967,11 @@ public class Accueil extends javax.swing.JFrame {
     private javax.swing.JButton b2;
     private javax.swing.JButton b3;
     private javax.swing.JButton b4;
+    private javax.swing.JButton btn_addTask;
     private javax.swing.JButton btn_done;
+    private javax.swing.JButton btn_dropTask;
     private javax.swing.JButton btn_help;
     private javax.swing.JButton btn_history;
-    private javax.swing.JButton btn_unity;
     private javax.swing.JButton cls;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
@@ -926,4 +999,9 @@ public class Accueil extends javax.swing.JFrame {
     public void setPan_Cal(JPanel pan_Cal) {
         this.pan_Cal = pan_Cal;
     }
+    
+    public DefaultTableModel getModel(){
+        return model;
+    }
+    
 }

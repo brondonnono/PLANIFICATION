@@ -24,13 +24,15 @@ public class HistoryView extends javax.swing.JFrame {
     /**
      * Creates new form History
      */
-    public HistoryView() {}
+    public HistoryView() {
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+    }
     
     public HistoryView(Accueil parent) {  
         this.parent = parent;
-        this.historyList = this.parent.storageController.getFileReader().readFileDataHistory();
+        this.historyList = this.parent.storageController.getFileReaderHistory().readFileDataHistory();
         this.setTitle(title);
-        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setIconImage((new ImageIcon(getClass().getResource("/com/java/gt/img/logo.png"))).getImage());
         this.setResizable(false);
         this.setVisible(true);
@@ -74,21 +76,22 @@ public class HistoryView extends javax.swing.JFrame {
     public void clean(ArrayList<History> historyList) {
         tmpList = new ArrayList<History>();
         historyList.forEach((history) -> {
-            if(history.getId() != Integer.parseInt(parent.elem[0]))
-                tmpList.add(history);
+            tmpList.add(history);
         });
+        tmpList.removeAll(historyListArranged);
+        //.out.println("tmpList: "+tmpList);
     }
     
     public void clearAllHistory(){
         historyList.clear();
-        parent.storageController.getFileWriter().renderAllHistory(historyList, parent.storageController.getFileReader().getFileHistory());
+        parent.storageController.getFileWriterHistory().renderAllHistory(historyList);
         this.historyListArranged.clear();
         initTable(historyListArranged);
     }
     
     public void clearSpecifiedHistory(){
-        System.out.println("liste Temporaire :"+ tmpList);
-        parent.storageController.getFileWriter().renderAllHistory(tmpList, parent.storageController.getFileReader().getFileHistory());
+        //System.out.println("liste Temporaire :"+ tmpList);
+        parent.storageController.getFileWriterHistory().renderAllHistory(tmpList);
         this.historyListArranged.clear();
         initTable(historyListArranged);
     }

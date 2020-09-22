@@ -28,36 +28,12 @@ public class CustomFileWriter {
     // Définition des constructeurs
     public CustomFileWriter(){}
     
-    public CustomFileWriter(String folderName, String[] data){
-        this.folderName = folderName;
-        this.file = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + folderName + "/" + StorageConfig.DEFAULT_HISTORY_FILE_STORAGE_NAME);
-        this.folder = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + folderName);
-        StorageConfig.createFolderIfNotExist(this.folder);
-        StorageConfig.createFileIfNotExist(this.file);
-    }
-    
-    public CustomFileWriter(String[] data, String defaultFileName){
-        this.file = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + defaultFileName);
-        StorageConfig.createFileIfNotExist(this.file);
-    }
-
     public CustomFileWriter(String folderName) {
         this.folderName = folderName;
         this.file = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + folderName + "/" + StorageConfig.DEFAULT_FILE_STORAGE_NAME);
-        this.folder = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + folderName);
+        this.folder = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + folderName);        
         StorageConfig.createFolderIfNotExist(this.folder);
         StorageConfig.createFileIfNotExist(this.file);
-    }
-
-    public void saveData(String[] data) {
-        String line = this.computeFileLine(data);
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.file.getAbsolutePath(), true))) {
-            writer.write(line);
-            writer.newLine();
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        };
     }
     
     public void saveNotificationData(Notification notif) {
@@ -81,35 +57,13 @@ public class CustomFileWriter {
             e.printStackTrace();
         };
     }
-
-    public void saveData(History history) {
-        String line = this.computeFileLine(history);
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.file.getAbsolutePath(), true))) {
-            writer.write(line);
-            writer.newLine();
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        };
-    }    
-
-
+    
     public String computeFileLine(Task task) {
         SimpleDateFormat DateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
         String lastMaintaintDate= DateFormat.format(task.getLastMaintaintDate());
         String line = task.getName() + "-" + task.getInterval() + "-" + task.getSecteur() 
             + "-" + lastMaintaintDate + "-" + task.getOperatingTime() 
             + "-" + task.getType();
-        return line;
-    }
-    
-    public String computeFileLine(String[] data) {
-        return data[0]+ "-" + data[1] + "-" + data[2]+ "-"+ data[3];
-    }
-    public String computeFileLine(History history) {
-        SimpleDateFormat DateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
-        String date = DateFormat.format(history.getDate());
-        String line = history.getId()+ "-" + history.getArticle()+ "-" + date + "-" +history.getOperator();
         return line;
     }
 
@@ -126,12 +80,6 @@ public class CustomFileWriter {
         for(Task newTask: newTaskList) {
             this.saveTask(newTask);
         }
-    }
-
-    public void renderAllHistory(ArrayList<History> newHistoryList, File file){
-        this.reinitilaliseFile(file);
-        for(History newHistory: newHistoryList)
-            this.saveData(newHistory);
     }
     
     public void renderAllNotifications(ArrayList<Notification> newNotificationList, File file){

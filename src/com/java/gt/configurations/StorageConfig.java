@@ -21,7 +21,9 @@ public class StorageConfig {
     public static String DEFAULT_HISTORY_FILE_STORAGE_NAME = "history.txt";
     //Nom du fichier de stockage des notifications des taches 
     public static String DEFAULT_NOTIFICATION_FILE_NAME = "notification.txt";
-    
+    //Fréquence de sauvegarde  des temps d'exécution de tâches en seconde
+    public static int DEFAULT_OPERATING_TIME_SAVE_DATA_FREQUENCY_IN_SECOND = 2;
+
     /**
      * @void
      * @param file 

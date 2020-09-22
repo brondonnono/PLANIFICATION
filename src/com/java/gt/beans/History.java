@@ -34,6 +34,7 @@ public class History {
         try{
             this.date  = new SimpleDateFormat("dd/MM/yyyy hh:mm").parse(date);
         }catch(ParseException e){}
+        //System.out.println("date"+ this.date);
         this.operator = operator;
     }
     

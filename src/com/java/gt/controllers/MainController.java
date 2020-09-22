@@ -6,6 +6,7 @@ import com.java.gt.beans.Equipment;
 import com.java.gt.beans.Task;
 import com.java.gt.controllers.beans_controllers.EquipmentController;
 import com.java.gt.controllers.store_controllers.StorageController;
+import com.java.gt.threads.MainThread;
 
 /**
  * @author Arléon Zemtsop
@@ -54,13 +55,19 @@ public class MainController {
             index++;
         }
         MainController.initEquipementTask();
+        MainController.launchThread();
+    }
+    
+    public static void launchThread(){
+        MainController.equipmentList.forEach((equipment) ->{
+            new MainThread(equipment.getStorageController()).start();
+        });   
     }
     
     public static void initCurrentTaskList(int indexEquip) {
         EquipmentController equipmentController = MainController.getEquipementById(indexEquip);
         for(int i=0; i<equipmentController.getEquipment().getTaskList().size(); i++) {
-            for(int j=0; j<MainController.CURRENT_TASK_LIST_HEADER.length; j++) {
-                
+            for(int j=0; j<MainController.CURRENT_TASK_LIST_HEADER.length; j++) {    
             }
         }
     }

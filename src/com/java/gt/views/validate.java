@@ -12,6 +12,7 @@ import com.java.gt.configurations.StorageConfig;
 import com.java.gt.store.CustomFileWriter;
 import java.io.File;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 /**
  *
@@ -22,6 +23,7 @@ public class validate extends javax.swing.JFrame {
     public String[] data = {"","","","",""};
     private static String folderName;
     private static CustomFileWriter file;
+    private Accueil fen; 
     private ArrayList<Task> taskList = new ArrayList<Task>();
     private ArrayList<Notification> notificationList = new ArrayList<Notification>(), newNotificationList = new ArrayList<Notification>();
     /**
@@ -36,7 +38,7 @@ public class validate extends javax.swing.JFrame {
         
         data[0] = parent.elem[0];
         data[1] = parent.elem[3];
-        
+        this.fen = parent;
         this.taskList = parent.taskList;
         this.notificationList = parent.notificationList;
         this.folderName = parent.storageController.getFileReader().getFolderName();
@@ -44,6 +46,7 @@ public class validate extends javax.swing.JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setResizable(false);
         setLocationRelativeTo(null);
+        setIconImage((new ImageIcon(getClass().getResource("/com/java/gt/img/logo.png"))).getImage());
     }
     
     private void ClearNotification(){
@@ -223,9 +226,7 @@ public class validate extends javax.swing.JFrame {
             data[2] = data[2]+" "+heure.getText();
             for(String str:data)
                 System.out.println(str);
-            file = new CustomFileWriter(folderName, data);
-            
-            file.saveData(new History(Integer.parseInt(data[0]), data[1], data[2], data[3]));
+            fen.storageController.getFileWriterHistory().saveData(new History(Integer.parseInt(data[0]), data[1], data[2], data[3]));
             reinitializeTask();
             ClearNotification();
             

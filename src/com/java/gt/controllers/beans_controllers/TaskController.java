@@ -15,6 +15,8 @@ public class TaskController {
      * d'une tâche depuis sa dernière maintenance
      */
     public static int getPourcentage(Task task) {
+        if(task.getOperatingTimeInHours() > task.getInterval())
+            return 100;
         return Math.round(task.getOperatingTimeInHours()/task.getInterval() * 100);
     }
     /**

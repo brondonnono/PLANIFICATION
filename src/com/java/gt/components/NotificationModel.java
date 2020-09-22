@@ -23,7 +23,7 @@ public class NotificationModel extends AbstractTableModel {
         
         public NotificationModel(){
             notificationList = new CustomFileReader().readFileDataNotification();
-            System.out.println("NotificationModel : "+ notificationList);
+            //System.out.println("NotificationModel : "+ notificationList);
         }
 
 	@Override

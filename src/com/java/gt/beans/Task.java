@@ -40,12 +40,6 @@ public class Task {
         this.operatingTime = operatingTime;
         this.type = type;
     }
-      
-    public Task(String folderName, String type, String article, int interval){
-        this.type = type;
-        this.interval = interval;
-        this.secteur = article;
-    }
     
     // Définition des getters and setters
     public int getId() {
@@ -120,7 +114,7 @@ public class Task {
             return operatingTime;
     }
     public int getOperatingTimeInHours() { 
-            return Math.round(this.operatingTime/3600);
+            return this.operatingTime/3600;
     }
     public String displayOperatingTime() { 
             String opTimeInHours = Math.round(this.operatingTime/3600) + "";

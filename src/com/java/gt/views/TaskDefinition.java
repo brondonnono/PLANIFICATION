@@ -8,11 +8,14 @@ package com.java.gt.views;
 import com.java.gt.beans.Task;
 import com.java.gt.controllers.MainController;
 import com.java.gt.store.CustomFileWriter;
+import static com.java.gt.views.Accueil.canRead;
 import java.awt.Dimension;
 import static java.lang.Integer.parseInt;
+import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -24,21 +27,20 @@ public class TaskDefinition extends javax.swing.JFrame {
     private final String[] FOLDERNAMES = new MainController().EQUIPMENT_LIST; 
     private String article;
     private String interval;
-    private JFrame setting;
     private DefaultComboBoxModel model;
+    private Accueil fen;
     /**
      * Creates new form TaskDefinition
      */
-    public TaskDefinition(){
-    }
-   public TaskDefinition(JFrame setting) {
+
+   public TaskDefinition(Accueil fen) {
        
         setResizable(false);
-        this.setting = setting;
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setIconImage((new ImageIcon(getClass().getResource("/com/java/gt"+"/img/logo.png"))).getImage());
         this.setLocation((int)java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth()/6, (int)java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight()/(13/2));
         initComponents();
+        this.fen = fen;
         validate.setEnabled(false);
         initsBox();
     }
@@ -54,8 +56,19 @@ public class TaskDefinition extends javax.swing.JFrame {
     private void CreateTask(){
         article = txt_article.getText();
         interval = txt_interval.getText();   
-        System.out.println("Emplacement: "+box_folder.getSelectedItem().toString()+"\nAction: "+box_action.getSelectedItem().toString()+"\nArticle: "+article+"\nInterval: "+interval);
-        new CustomFileWriter(box_folder.getSelectedItem().toString()).saveTask(new Task(box_folder.getSelectedItem().toString(),box_action.getSelectedItem().toString(), article, parseInt(interval)));
+        //System.out.println("Emplacement: "+box_folder.getSelectedItem().toString()+"\nAction: "+box_action.getSelectedItem().toString()+"\nArticle: "+article+"\nInterval: "+interval);
+        MainController.equipmentList.forEach((equipment) ->{
+            if(equipment.getStorageController().getFolderName().equals(box_folder.getSelectedItem().toString())){
+                Task task = new Task(equipment.getStorageController().getFileReader().getTaskList().size()+1,"Tâche",Integer.parseInt(interval), article,new Date(), 0, box_action.getSelectedItem().toString());
+                //System.out.println("taille :"+equipment.getStorageController().getFileReader().getTaskList().size());
+                equipment.getStorageController().getFileReader().getTaskList().add(task);
+                if(fen.checked[0].equals(box_folder.getSelectedItem().toString()) && fen.checked[1].equals(box_action.getSelectedItem().toString())){
+                    fen.getModel().addRow(new Object[]{task.getId(), box_folder.getSelectedItem().toString()+"  "+task.getType(), task.displayInterval(), task.getSecteur()+" "+task.getName(), task.getLastMaintaintDate(), task.displayOperatingTime()});
+                    fen.getModel().fireTableDataChanged();
+                }
+                return;
+            }   
+        });
     }
 
     private void StateVerification(){
@@ -144,7 +157,7 @@ public class TaskDefinition extends javax.swing.JFrame {
         jLabel4.setText("      Article                     :");
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLabel5.setText("      Intervalle              :");
+        jLabel5.setText("     Intervalle (en H)   :");
 
         box_folder.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
@@ -243,12 +256,12 @@ public class TaskDefinition extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(90, 90, 90)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(validate, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(close, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(close, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(146, 146, 146)
+                        .addComponent(validate, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(90, 90, 90))
         );
         jPanel2Layout.setVerticalGroup(
@@ -256,11 +269,11 @@ public class TaskDefinition extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(46, 46, 46)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(32, 32, 32)
+                .addGap(29, 29, 29)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(validate, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(close, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(34, Short.MAX_VALUE))
+                    .addComponent(close, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(validate, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(46, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -303,12 +316,15 @@ public class TaskDefinition extends javax.swing.JFrame {
     private void validateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_validateActionPerformed
         // TODO add your handling code here:
         CreateTask();
+        JOptionPane.showMessageDialog(null,"Tâche ajoutée avec succès");
+        txt_article.setText("");
+        txt_interval.setText(""); 
     }//GEN-LAST:event_validateActionPerformed
 
     private void closeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeActionPerformed
         // TODO add your handling code here:
         dispose();
-        this.setting.setVisible(true);
+        
     }//GEN-LAST:event_closeActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing

@@ -11,12 +11,12 @@ import javax.swing.ImageIcon;
  *
  * @author Brondon Nono
  */
-public class Setting extends javax.swing.JFrame {
+public class Setting1 extends javax.swing.JFrame {
 
     /**
      * Creates new form Setting
      */
-    public Setting() {
+    public Setting1() {
         setResizable(false);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         this.setIconImage((new ImageIcon(getClass().getResource("/com/java/gt"+"/img/logo.png"))).getImage());
@@ -212,7 +212,7 @@ public class Setting extends javax.swing.JFrame {
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         // TODO add your handling code here:
-        new TaskDefinition(this).setVisible(true);
+//        new TaskDefinition().setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_jButton6ActionPerformed
 
