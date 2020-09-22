@@ -18,11 +18,9 @@ import javax.swing.table.DefaultTableCellRenderer;
 public class NotificationCellRenderer extends DefaultTableCellRenderer {
     
     private String elem;
-    private  String[] dt = {"","",""};
     
-    public NotificationCellRenderer(String elem, String[] dt){
+    public NotificationCellRenderer(String elem){
         this.elem = elem;
-        this.dt = dt;
     }
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -36,27 +34,8 @@ public class NotificationCellRenderer extends DefaultTableCellRenderer {
             else
                 setBackground(Color.yellow);
             
-        }/* else if(elem.equalsIgnoreCase("temps")) {
-                    System.out.println(elem);
-                    System.out.println(dt[0]);
-                    Date date = (Date) value;
-                    setText(date.toString());
-                    if(dt[0].equalsIgnoreCase("Alert"))
-                        setBackground(Color.red);
-                    else
-                        setBackground(Color.yellow);
-            } else if(elem.equalsIgnoreCase("Messages")){
-                    System.out.println(elem);
-                    System.out.println(dt[0]);
-                    String msg = (String) value;
-                    setText(msg);
-                    if(dt[0].equalsIgnoreCase("Alert"))
-                        setBackground(Color.red);
-                    else
-                        setBackground(Color.yellow);
-                }
-        */        
-       
+        }       
+      
         return this;
     }
 

@@ -23,6 +23,7 @@ public class StorageConfig {
     public static String DEFAULT_NOTIFICATION_FILE_NAME = "notification.txt";
     //Fréquence de sauvegarde  des temps d'exécution de tâches en seconde
     public static int DEFAULT_OPERATING_TIME_SAVE_DATA_FREQUENCY_IN_SECOND = 2;
+    public static int DEFAULT_RENDER_NOTIFICATION_FREQUENCY_IN_SECOND = 2;
 
     /**
      * @void

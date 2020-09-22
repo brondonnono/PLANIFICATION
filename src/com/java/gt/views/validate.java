@@ -10,6 +10,7 @@ import com.java.gt.beans.Notification;
 import com.java.gt.beans.Task;
 import com.java.gt.configurations.StorageConfig;
 import com.java.gt.store.CustomFileWriter;
+import com.java.gt.store.CustomFileWriterNotification;
 import java.io.File;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
@@ -59,7 +60,7 @@ public class validate extends javax.swing.JFrame {
                // notificationList.remove(notif);
         });
         System.out.println("Notif new :"+ newNotificationList);
-        new CustomFileWriter().renderAllNotifications(newNotificationList, new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + StorageConfig.DEFAULT_NOTIFICATION_FILE_NAME));
+        new CustomFileWriterNotification().renderAllNotifications(newNotificationList, new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + StorageConfig.DEFAULT_NOTIFICATION_FILE_NAME));
     }
 
     private void reinitializeTask() {

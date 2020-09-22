@@ -35,18 +35,7 @@ public class CustomFileWriter {
         StorageConfig.createFolderIfNotExist(this.folder);
         StorageConfig.createFileIfNotExist(this.file);
     }
-    
-    public void saveNotificationData(Notification notif) {
-        String line = this.computeNotificationFileLine(notif);
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.file.getAbsolutePath(), true))) {
-            writer.write(line);
-            writer.newLine();
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        };
-    }
-   
+     
     public void saveTask(Task task) {
         String line = this.computeFileLine(task);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.file.getAbsolutePath(), true))) {
@@ -67,14 +56,6 @@ public class CustomFileWriter {
         return line;
     }
 
-    public String computeNotificationFileLine(Notification notif) {
-        SimpleDateFormat DateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-        String createdAt= DateFormat.format(notif.getCreatedAt());
-        String line = notif.getId() + "-" + notif.getType() + "-" + createdAt 
-            + "-"+ notif.getMessage();
-        return line;
-    }
-
     public void renderAllTasks(ArrayList<Task> newTaskList) {
         this.reinitilaliseFile();
         for(Task newTask: newTaskList) {
@@ -82,12 +63,6 @@ public class CustomFileWriter {
         }
     }
     
-    public void renderAllNotifications(ArrayList<Notification> newNotificationList, File file){
-        this.reinitilaliseFile(file);
-        for(Notification newNotif: newNotificationList)
-            this.saveNotificationData(newNotif);
-    }
-
     public void renderOperatingTime(int nbSecond, ArrayList<Task> taskList) {
         for(Task task: taskList) {
             task.setOperatingTime(task.getOperatingTime() + nbSecond);
@@ -106,11 +81,6 @@ public class CustomFileWriter {
         }
     }
     
-    public void reinitilaliseFile(File file) {
-        this.file = file; 
-        reinitilaliseFile();
-    }
-
     public String getFolderName() {
 	return folderName;
     }

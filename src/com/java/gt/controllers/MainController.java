@@ -40,8 +40,8 @@ public class MainController {
         int index = 1;
         for(String equipName: MainController.EQUIPMENT_LIST) {
             StorageController storageController = new StorageController(equipName);
-            ArrayList<Task> taskList = new ArrayList<Task>();
-            taskList =  storageController.getFileReader().getTaskList();
+            ArrayList<Task> taskList;
+            taskList = storageController.getFileReader().getTaskList();
             Equipment equipement = null;
             if(taskList != null) {
                 equipement = new Equipment(index, equipName, taskList);

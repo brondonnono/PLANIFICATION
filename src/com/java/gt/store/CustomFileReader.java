@@ -23,14 +23,12 @@ import com.java.gt.configurations.StorageConfig;
 public class CustomFileReader {
     // Définition des attributs
     // Définition du fichier
-    private File file,notificationsFile = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + StorageConfig.DEFAULT_NOTIFICATION_FILE_NAME);;
+    private File file;
     // Définition du dossier
     private File folder;
     private String folderName;
     // Définition de la liste des tâches qui seront lues dépuis le fichier
     private ArrayList<Task> taskList = new ArrayList<Task>();
-    private ArrayList<Notification> notificationList = new ArrayList<Notification>();
-
 
     public CustomFileReader(){}
 
@@ -46,10 +44,8 @@ public class CustomFileReader {
         this.taskList = new ArrayList<Task>();
         this.file = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + folderName + "/" + StorageConfig.DEFAULT_FILE_STORAGE_NAME);
         this.folder = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + folderName);
-        this.notificationsFile = new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + StorageConfig.DEFAULT_NOTIFICATION_FILE_NAME);
         StorageConfig.createFolderIfNotExist(this.folder);
         StorageConfig.createFileIfNotExist(this.file);
-        StorageConfig.createFileIfNotExist(this.notificationsFile);
     }
     /**
      * @param attributeList
@@ -72,25 +68,7 @@ public class CustomFileReader {
         Task t = new Task(index, name, interval, secteur, lastMaintaintDate, operatingTime, type);
         this.taskList.add(t);
     }
-    
-
-    public void computeNotification(String[] attributeList) {
-        Date createdAt = null; 
-        try {
-            createdAt = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(attributeList[2]);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        int id = 0;
-         try{
-            id = Integer.parseInt(attributeList[0]);
-        }catch(NumberFormatException e){}
-        String type = attributeList[1];
-        String message = attributeList[3];  
-        Notification n = new Notification(id, type, createdAt, message);
-        this.notificationList.add(n);
-    }
-     
+   
    /**
      * @return ArrayList<Task>
      * Cette fonction parcours le fichier et le lit lignes après lignes
@@ -115,28 +93,7 @@ public class CustomFileReader {
             }
         } catch(IOException e) {} 
         return new ArrayList<Task>();
-    }
-
-
-    public ArrayList<Notification> readFileDataNotification() {
-        String fileName = this.notificationsFile.getAbsolutePath();
-        Path path = Paths.get(fileName);
-        try {
-            if(!Files.readAllLines(path).isEmpty()) {      
-                for(String line: Files.readAllLines(path)) {
-                    String[] attributeList = line.split("-");
-                    if(attributeList.length > 0) {
-                        this.computeNotification(attributeList);
-                    }
-                }
-    //            for(Notification notif: this.notificationList)
-   //                 System.out.println("notification: " + notif.toString());
-                return this.notificationList;
-            }
-        } catch(IOException e) {} 
-        return new ArrayList<Notification>();
-    }
-    
+    }    
     /**
      * Afficher toutes les tâches luent dans la console
      */
@@ -162,22 +119,5 @@ public class CustomFileReader {
 
     public void setTaskList(ArrayList<Task> taskList) {
         this.taskList = taskList;
-    }
-    
-    
-    public ArrayList<Notification> getNotificationList() {
-        System.out.println("getNotificationList :\n"+ this.notificationList);
-        return this.notificationList;
-    }
-    
-    public void setNotificationList(ArrayList<Notification> notificationList) {
-        this.notificationList = notificationList;
-    }
-
-    @Override
-    public String toString() {
-        return "CustomFileReader [file=" + file + ", folder=" + folder
-                + ", folderName=" + folderName + ", notificationList="
-                + notificationList + ", notificationsFile=" + notificationsFile + ", taskList=" + taskList + "]";
     }
 }

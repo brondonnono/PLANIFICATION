@@ -120,6 +120,11 @@ public class Task {
             String opTimeInHours = Math.round(this.operatingTime/3600) + "";
             return opTimeInHours + "/" + interval + "                      "+ TaskController.displayPourcentage(this);
     }
+    
+    public boolean notifAlert(){
+        return this.getOperatingTimeInHours() >= this.getInterval();    
+    }
+    
     public void setOperatingTime(int operatingTime) {
             this.operatingTime = operatingTime;
     }

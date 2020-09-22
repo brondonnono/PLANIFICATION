@@ -9,10 +9,12 @@ import com.java.gt.beans.Notification;
 import com.java.gt.beans.Task;
 import com.java.gt.calendar.CalendrierCadre;
 import com.java.gt.components.NotificationCellRenderer;
-import com.java.gt.components.NotificationModel;
 import com.java.gt.controllers.MainController;
+import com.java.gt.controllers.beans_controllers.EquipmentController;
 import com.java.gt.controllers.store_controllers.StorageController;
 import com.java.gt.store.CustomFileReader;
+import com.java.gt.store.CustomFileReaderNotification;
+import com.java.gt.threads.NotificationThread;
 import com.java.gt.threads.TbleThread;
 import java.awt.Color;
 import java.awt.Component;
@@ -24,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -52,8 +55,7 @@ public class Accueil extends javax.swing.JFrame {
     public final String[] TASK_TYPE = new Task().TASK_TYPE_LABEL;
     public StorageController storageController = new StorageController();
     public String[] checked = {"",""}, elem = {"","","","",""}, dt = {"", "", ""};
-    private final static String title = "PLANIFICATION"; 
-    public NotificationModel notificationModel = new NotificationModel();
+    private final static String title = "PLANIFICATION";
     public JTable table;
     public static boolean canRead = false;
         
@@ -220,11 +222,10 @@ public class Accueil extends javax.swing.JFrame {
     
     private void showNotification(ArrayList<Notification> notificationList) {
         notifModel = new DefaultTableModel();
-        notifModel.addColumn("Nº Tâche");
+        notifModel.addColumn("Nom equipment -> Action");
         notifModel.addColumn("Type");
         notifModel.addColumn("Temps");
         notifModel.addColumn("Messages");
-        table = new JTable(notificationModel);
         //tble_alert = new JTable(notificationModel);
         if(!notificationList.isEmpty()){
             notificationList.forEach((notification) -> {
@@ -241,29 +242,40 @@ public class Accueil extends javax.swing.JFrame {
     private void warningNotification(Notification notification){
         System.out.println("Warning: "+notification.toString());
         dt[0] = notification.getType();
-        notifModel.addRow(new Object[]{notification.getId(), notification.getType(), notification.getCreatedAt(), notification.getMessage()});
+        String equipmentName = MainController.equipmentList.get(notification.getEquipmentId()+1).getEquipment().getName();
+        String taskType = MainController.equipmentList.get(notification.getEquipmentId()+1).getEquipment().getTaskList().get(notification.getTaskId()).getType();
+
+        notifModel.addRow(new Object[]{equipmentName+" -> "+taskType, notification.getType(), notification.getCreatedAt(), notification.getMessage()});
         tble_alert.setModel(notifModel);
         for(int i=0; i<4; i++)
-            tble_alert.getColumnModel().getColumn(i).setCellRenderer(new NotificationCellRenderer(tble_alert.getColumnName(i),dt));
+            tble_alert.getColumnModel().getColumn(i).setCellRenderer(new NotificationCellRenderer(tble_alert.getColumnName(i)));
         main_pan.add(pan_alert);
     }
     
     private void alertNotification(Notification notification){
         System.out.println("Alert: "+notification.toString());
         dt[0] = notification.getType();
-        notifModel.addRow(new Object[]{notification.getId(), notification.getType(), notification.getCreatedAt(), notification.getMessage()});
-        tble_alert.setModel(notifModel);
+        String equipmentName = MainController.equipmentList.get(notification.getEquipmentId()+1).getEquipment().getName();
+        String taskType = MainController.equipmentList.get(notification.getEquipmentId()+1).getEquipment().getTaskList().get(notification.getTaskId()).getType();
+        notifModel.addRow(new Object[]{equipmentName+" -> "+taskType, notification.getType(), notification.getCreatedAt(), notification.getMessage()});        tble_alert.setModel(notifModel);
         for(int i=1; i<4; i++)
-            tble_alert.getColumnModel().getColumn(i).setCellRenderer(new NotificationCellRenderer(tble_alert.getColumnName(i),dt));
-                        
-//System.out.println(tble_alert.getColumnName(0));
+            tble_alert.getColumnModel().getColumn(i).setCellRenderer(new NotificationCellRenderer(tble_alert.getColumnName(i)));
         main_pan.add(pan_alert);
+    }
+    
+    private void getNotificationList(){
+        for(EquipmentController equipment:MainController.equipmentList){
+            for(Task task :equipment.getStorageController().getFileReader().getTaskList()){
+                if(task.notifAlert())
+                    notificationList.add(new Notification(task.getId(),equipment.getEquipment().getId(),new Date(),task.getSecteur(),"Alert"));
+            }    
+        }
     }
     
     private void jbInit() throws Exception {
     
         //recuperation de la liste des tâches
-        notificationList = new CustomFileReader().readFileDataNotification();
+        getNotificationList();
         
         //desactivation des boutons liés aux tâches
         taskButtons[0] = btn_help;
@@ -286,6 +298,8 @@ public class Accueil extends javax.swing.JFrame {
         btnState(buttons, false);
         
         new TbleThread(this).start();
+        new NotificationThread(this).start();
+        
     } 
     
     public void btnState(JButton[] btn, boolean state) {
@@ -811,14 +825,14 @@ public class Accueil extends javax.swing.JFrame {
 
     private void formMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseEntered
         // TODO add your handling code here:
-        try {
-            notificationList = new CustomFileReader().readFileDataNotification();
-            showNotification(notificationList);
-            
+/*        try {
+            //notificationList = new CustomFileReaderNotification().readFileDataNotification();
+            showNotification(notificationList);     
         }
         catch(Exception e) {
             e.printStackTrace();
-        }
+       }
+*/ 
     }//GEN-LAST:event_formMouseEntered
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -1003,5 +1017,10 @@ public class Accueil extends javax.swing.JFrame {
     public DefaultTableModel getModel(){
         return model;
     }
-    
+    public DefaultTableModel getNotifModel(){
+        return notifModel;
+    }
+    public JTable getTableAlert(){
+        return tble_alert;
+    }
 }
