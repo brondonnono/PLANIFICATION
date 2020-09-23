@@ -49,8 +49,6 @@ public class MainController {
             if(equipement != null) {
                 //System.out.println("Storage controller: " + storageController);
                 MainController.equipmentList.add(new EquipmentController(equipement, storageController));
-                
-                storageController.getTaskList();
             }
             index++;
         }
@@ -94,8 +92,7 @@ public class MainController {
     }
     
     public static ArrayList<Task> getAllEquipementTasks(String NameEquip) {
-        EquipmentController equipmentController = MainController.getEquipementByTagName(NameEquip);
-        return equipmentController.getEquipment().getTaskList();
+        return MainController.getEquipementByTagName(NameEquip).getTaskList();
     }    
     
     /**
@@ -148,10 +145,10 @@ public class MainController {
         return MainController.equipmentList.get(indexEquip);
     }
 
-    public static EquipmentController getEquipementByTagName(String NameEquip) {
+    public static Equipment getEquipementByTagName(String NameEquip) {
         for(int i=0; i<equipmentList.size(); i++)
-            if(equipmentList.get(i).getEquipment().getName()== NameEquip)
-                return equipmentList.get(i);
+            if(equipmentList.get(i).getEquipment().getName().equals(NameEquip))
+                return equipmentList.get(i).getEquipment();
         return null;
     }
 

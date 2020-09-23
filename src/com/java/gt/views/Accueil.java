@@ -95,10 +95,8 @@ public class Accueil extends javax.swing.JFrame {
         if(canRead){
             this.taskList = storageController.getFileReader().getTaskList();
             if(taskList != null){
-               // if(!taskList.isEmpty())
                 arrangeTaskList(taskList,type);
                 this.taskListArranged.forEach((task) -> {
-                    //System.out.println(task);
                     model.addRow(new Object[]{task.getId(), checked[0]+"  "+task.getType(), task.displayInterval(), task.getSecteur()+" "+task.getName(), task.getLastMaintaintDate(), task.displayOperatingTime()});
                 });        
                 tble.setModel(model);
@@ -220,7 +218,7 @@ public class Accueil extends javax.swing.JFrame {
         };
     }
     
-    private void showNotification(ArrayList<Notification> notificationList) {
+    public void showNotification(ArrayList<Notification> notificationList) {
         notifModel = new DefaultTableModel();
         notifModel.addColumn("Nom equipment -> Action");
         notifModel.addColumn("Type");
@@ -240,10 +238,8 @@ public class Accueil extends javax.swing.JFrame {
     }
     
     private void warningNotification(Notification notification){
-        System.out.println("Warning: "+notification.toString());
-        dt[0] = notification.getType();
-        String equipmentName = MainController.equipmentList.get(notification.getEquipmentId()+1).getEquipment().getName();
-        String taskType = MainController.equipmentList.get(notification.getEquipmentId()+1).getEquipment().getTaskList().get(notification.getTaskId()).getType();
+        String equipmentName = MainController.equipmentList.get(notification.getEquipmentId()-1).getEquipment().getName();
+        String taskType = MainController.equipmentList.get(notification.getEquipmentId()-1).getEquipment().getTaskList().get(notification.getTaskId()-1).getType();
 
         notifModel.addRow(new Object[]{equipmentName+" -> "+taskType, notification.getType(), notification.getCreatedAt(), notification.getMessage()});
         tble_alert.setModel(notifModel);
@@ -253,10 +249,8 @@ public class Accueil extends javax.swing.JFrame {
     }
     
     private void alertNotification(Notification notification){
-        System.out.println("Alert: "+notification.toString());
-        dt[0] = notification.getType();
-        String equipmentName = MainController.equipmentList.get(notification.getEquipmentId()+1).getEquipment().getName();
-        String taskType = MainController.equipmentList.get(notification.getEquipmentId()+1).getEquipment().getTaskList().get(notification.getTaskId()).getType();
+        String equipmentName = MainController.equipmentList.get(notification.getEquipmentId()-1).getEquipment().getName();
+        String taskType = MainController.equipmentList.get(notification.getEquipmentId()-1).getEquipment().getTaskList().get(notification.getTaskId()-1).getType();
         notifModel.addRow(new Object[]{equipmentName+" -> "+taskType, notification.getType(), notification.getCreatedAt(), notification.getMessage()});        tble_alert.setModel(notifModel);
         for(int i=1; i<4; i++)
             tble_alert.getColumnModel().getColumn(i).setCellRenderer(new NotificationCellRenderer(tble_alert.getColumnName(i)));
@@ -323,7 +317,6 @@ public class Accueil extends javax.swing.JFrame {
             elem[2] = model.getValueAt(i,2).toString();
             elem[3] = model.getValueAt(i,3).toString();
             elem[4] = model.getValueAt(i,4).toString();
-            //System.out.println(elem[0]);
         }
         catch (Exception e) {
             System.err.println(e);
@@ -335,9 +328,6 @@ public class Accueil extends javax.swing.JFrame {
         taskList.forEach((task) -> {
            if(task.getType().equals(type)){
                this.taskListArranged.add(task);
-               //System.out.println(type);
-               //System.out.println("taskListArranged"+"\n"+this.taskListArranged.toString());
-               
            }
         });
     }
@@ -369,7 +359,6 @@ public class Accueil extends javax.swing.JFrame {
         int reply = JOptionPane.showConfirmDialog(null, "Voulez-vous vraiment supprimer cette tâche ?", "Confirmation Suppression", JOptionPane.YES_NO_OPTION);
         if (reply == JOptionPane.YES_OPTION) {
             if(this.removeTask(Integer.parseInt(elem[0])-1)){
-                //.addRow(new Object[]{task.getId(), box_folder.getSelectedItem().toString()+"  "+task.getType(), task.displayInterval(), task.getSecteur()+" "+task.getName(), task.getLastMaintaintDate(), task.displayOperatingTime()});
                 model.removeRow(ligneSelected);
                 model.fireTableDataChanged();
                 JOptionPane.showMessageDialog(null, "Tâche supprimée");
@@ -377,10 +366,7 @@ public class Accueil extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Echec de suppression");
         } else {
             JOptionPane.showMessageDialog(null, "Suppression annulée");
-        }
-        
-        
-        
+        }  
     }
     
     /**

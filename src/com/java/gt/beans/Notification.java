@@ -65,9 +65,10 @@ public class Notification {
     public void setEquipmentId(int equipmentId) {
         this.equipmentId = equipmentId;
     }
-    
+
     @Override
     public String toString() {
-        return "Notification [id=" + id + ", type="+ type +", message=" + message + ", createdAt=" + createdAt +"]";
+        return "Notification{" + "taskId=" + taskId + ", equipmentId=" + equipmentId + ", createdAt=" + createdAt + ", message=" + message + ", type=" + type + '}';
     }
+    
 }

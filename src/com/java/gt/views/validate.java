@@ -9,6 +9,7 @@ import com.java.gt.beans.History;
 import com.java.gt.beans.Notification;
 import com.java.gt.beans.Task;
 import com.java.gt.configurations.StorageConfig;
+import com.java.gt.controllers.MainController;
 import com.java.gt.store.CustomFileWriter;
 import com.java.gt.store.CustomFileWriterNotification;
 import java.io.File;
@@ -52,15 +53,14 @@ public class validate extends javax.swing.JFrame {
     }
     
     private void ClearNotification(){
-        this.notificationList.forEach((notif) ->{
-            if(notif.getId() == Integer.parseInt(data[0])){
-                System.out.println("id :"+ notif.getId());
-            } else 
-                newNotificationList.add(notif);
-               // notificationList.remove(notif);
-        });
-        System.out.println("Notif new :"+ newNotificationList);
-        new CustomFileWriterNotification().renderAllNotifications(newNotificationList, new File(StorageConfig.DEFAULT_FOLDER_STORAGE_NAME + "/" + StorageConfig.DEFAULT_NOTIFICATION_FILE_NAME));
+        int equipmentId = MainController.getEquipementByTagName(fen.checked[0]).getId();
+        for(int i=0; i<fen.notificationList.size(); i++){
+            if(fen.notificationList.get(i).getEquipmentId() == equipmentId && fen.notificationList.get(i).getTaskId() == Integer.parseInt(fen.elem[0]))
+                fen.notificationList.remove(i);
+
+            return;
+        }
+        //System.out.println("Notif new :"+ newNotificationList);
     }
 
     private void reinitializeTask() {
