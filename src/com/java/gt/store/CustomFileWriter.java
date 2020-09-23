@@ -44,7 +44,7 @@ public class CustomFileWriter {
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
-        };
+        };    
     }
     
     public String computeFileLine(Task task) {
@@ -70,8 +70,11 @@ public class CustomFileWriter {
     }
 
     public void reinitilaliseFile() {
-        if(this.file.exists())
+        if(this.file.exists()){
+            System.out.println("file exist :" + file);
             this.file.delete();
+        
+        }
         if(!this.file.exists()){
             try {
                 this.file.createNewFile();

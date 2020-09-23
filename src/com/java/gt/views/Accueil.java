@@ -14,8 +14,10 @@ import com.java.gt.controllers.beans_controllers.EquipmentController;
 import com.java.gt.controllers.store_controllers.StorageController;
 import com.java.gt.store.CustomFileReader;
 import com.java.gt.store.CustomFileReaderNotification;
+import com.java.gt.threads.MainThread;
 import com.java.gt.threads.NotificationThread;
 import com.java.gt.threads.TbleThread;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -30,6 +32,8 @@ import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -57,7 +61,7 @@ public class Accueil extends javax.swing.JFrame {
     public String[] checked = {"",""}, elem = {"","","","",""}, dt = {"", "", ""};
     private final static String title = "PLANIFICATION";
     public JTable table;
-    public static boolean canRead = false;
+    public static boolean canRead = false, SHOULD_STOP_APPLICATION = false;
         
              // control.init();
     
@@ -71,7 +75,7 @@ public class Accueil extends javax.swing.JFrame {
         this.setTitle(title);
         this.setSize((int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth(), (int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() -35);
         this.setIconImage((new ImageIcon(getClass().getResource("/com/java/gt/img/logo.png"))).getImage());
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         //this.setDefaultCloseOperation(HIDE_ON_CLOSE);
         try {
             jbInit();
@@ -152,6 +156,11 @@ public class Accueil extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String command = e.getActionCommand();
+                elem = new String[5];
+                for(int i=0; i<5; i++)
+                    elem[i] = "";
+                checked[1] = "";
+                clean(model);
                 for( int i=0; i < EQUIPMENT_LIST.length; i++) {
                     if(command.equals(EQUIPMENT_LIST[i])) {
                         if(!checked[0].equals(command))
@@ -177,12 +186,21 @@ public class Accueil extends javax.swing.JFrame {
                         taskList = control.getAllEquipementTasks(EQUIPMENT_LIST[i]);
                         checked[0] = command;
                         checked[1] = "";
+                        
+                        taskButtons[0] = btn_help;
+                        taskButtons[1] = btn_history;
+                        taskButtons[2] = btn_addTask;
+                        taskButtons[3] = btn_done;
+                        taskButtons[4] = btn_dropTask;
+                        btnState(taskButtons,false, false);
+                        
                         taskButtons[0] = ac1;
                         taskButtons[1] = ac2;
                         taskButtons[2] = ac3;
                         taskButtons[3] = btn_history;
                         taskButtons[4] = btn_addTask;
-                        btnState(taskButtons, true);
+                        btnState(taskButtons, true, true);
+                        
                     }
                 }
             }  
@@ -193,6 +211,9 @@ public class Accueil extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String command = e.getActionCommand();
+                elem = new String[5];
+                for(int i=0; i<5; i++)
+                    elem[i] = "";
                 for (String TASK_TYPE1 : TASK_TYPE) {
                     if (command.equals(TASK_TYPE1)) {
                         if(!checked[1].equals(command))
@@ -211,6 +232,22 @@ public class Accueil extends javax.swing.JFrame {
                         if(!taskListArranged.isEmpty())
                             taskListArranged.clear();
                         initTable(command);
+                        taskButtons[0] = btn_help;
+                        taskButtons[1] = btn_history;
+                        taskButtons[2] = btn_addTask;
+                        taskButtons[3] = btn_done;
+                        taskButtons[4] = btn_dropTask;
+                        btnState(taskButtons,false, true);
+                        
+                        taskButtons[0] = ac1;
+                        taskButtons[1] = ac2;
+                        taskButtons[2] = ac3;
+                        taskButtons[3] = btn_history;
+                        taskButtons[4] = btn_addTask;
+                        btnState(taskButtons, true, false);
+                        btnSetColor(btn_history,true);
+                        btnSetColor(btn_addTask,true);
+
                     }
                 }
                 //System.out.println("action");
@@ -277,7 +314,7 @@ public class Accueil extends javax.swing.JFrame {
         taskButtons[2] = btn_addTask;
         taskButtons[3] = btn_done;
         taskButtons[4] = btn_dropTask;
-        btnState(taskButtons,false);
+        btnState(taskButtons,false, true);
         
         calend = new CalendrierCadre(this);
         initListeners();
@@ -289,23 +326,29 @@ public class Accueil extends javax.swing.JFrame {
         buttons[0] = ac1;
         buttons[1] = ac2;
         buttons[2] = ac3;
-        btnState(buttons, false);
+        btnState(buttons, false, true);
         
         new TbleThread(this).start();
         new NotificationThread(this).start();
         
     } 
     
-    public void btnState(JButton[] btn, boolean state) {
+    public void btnState(JButton[] btn, boolean state, boolean giveColor) {
         for (JButton btn1 : btn){
             btn1.setEnabled(state);
-            if(state == false){
-                btn1.setBackground(Color.lightGray);
-                btn1.setForeground(Color.white);
-            }else{
-                btn1.setBackground(Color.black);
-                btn1.setForeground(Color.white);
-            }
+            if(giveColor)
+                btnSetColor(btn1,state);
+        }
+    }
+    
+    
+    private void btnSetColor(JButton btn1, boolean state){
+        if(state == false){
+            btn1.setBackground(Color.lightGray);
+            btn1.setForeground(Color.white);
+        }else{
+            btn1.setBackground(Color.black);
+            btn1.setForeground(Color.white);
         }
     }
     
@@ -367,6 +410,43 @@ public class Accueil extends javax.swing.JFrame {
         } else {
             JOptionPane.showMessageDialog(null, "Suppression annulée");
         }  
+    }
+    
+    private boolean canStopApplication(){
+        return MainThread.SAFE_SAVES[0] && MainThread.SAFE_SAVES[1] && MainThread.SAFE_SAVES[2] && MainThread.SAFE_SAVES[3];
+    }
+    
+    private void showCloseMessage() {
+        final JDialog dialog = new JDialog();
+        dialog.setTitle("Fermeture de l'application en cours");
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dialog.setSize(100, 100);
+        dialog.setLocationRelativeTo(null);
+        dialog.setIconImage((new ImageIcon(getClass().getResource("/com/java/gt/img/logo.png"))).getImage());
+        dialog.pack();
+        dialog.setVisible(true);
+    }
+    
+    private void stopThread(){
+        
+        int reply = JOptionPane.showConfirmDialog(null, "Voulez-vous vraiment fermer l'application ?", "Fermeture de l'application", JOptionPane.YES_NO_OPTION);
+        if (reply == JOptionPane.YES_OPTION) {
+           Accueil.SHOULD_STOP_APPLICATION = true;
+           //new AlertClosingFe().setVisible(true);
+           this.showCloseMessage();
+           do {
+               for(boolean bool: MainThread.SAFE_SAVES)
+                   System.out.println("accueil bool: "+ bool);
+                   System.out.println("-----------------------------------------------");
+           } while(!canStopApplication());
+           for(boolean bool: MainThread.SAFE_SAVES)
+                   System.out.println("accueil bool: "+ bool);
+                   System.out.println("-----------------------------------------------");
+           System.exit(0);
+           
+        } else {
+           Accueil.SHOULD_STOP_APPLICATION = false;
+        } 
     }
     
     /**
@@ -440,6 +520,11 @@ public class Accueil extends javax.swing.JFrame {
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 formMouseEntered(evt);
+            }
+        });
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
             }
         });
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.LINE_AXIS));
@@ -821,9 +906,14 @@ public class Accueil extends javax.swing.JFrame {
 */ 
     }//GEN-LAST:event_formMouseEntered
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        stopThread();
+    }//GEN-LAST:event_formWindowClosing
+
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        System.exit(0);
+        stopThread();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void clsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clsActionPerformed
@@ -834,13 +924,13 @@ public class Accueil extends javax.swing.JFrame {
         taskButtons[2] = btn_addTask;
         taskButtons[3] = btn_done;
         taskButtons[4] = btn_dropTask;
-        btnState(taskButtons,false);
+        btnState(taskButtons,false, true);
 
         for(JButton btn:buttons){
             btn.setBackground(Color.black);
             btn.setForeground(Color.white);
         }
-        btnState(buttons,false);
+        btnState(buttons,false, true);
         boutons[0] = b1;
         boutons[1] = b2;
         boutons[2] = b3;
@@ -863,15 +953,20 @@ public class Accueil extends javax.swing.JFrame {
         new HistoryView(this).setVisible(true);
     }//GEN-LAST:event_btn_historyActionPerformed
 
+    private void btn_doneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_doneActionPerformed
+        // TODO add your handling code here:
+        new validate(this).setVisible(true);
+    }//GEN-LAST:event_btn_doneActionPerformed
+
     private void btn_addTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addTaskActionPerformed
         // TODO add your handling code here:
         new TaskDefinition(this).setVisible(true);
     }//GEN-LAST:event_btn_addTaskActionPerformed
 
-    private void btn_doneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_doneActionPerformed
+    private void btn_dropTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_dropTaskActionPerformed
         // TODO add your handling code here:
-        new validate(this).setVisible(true);
-    }//GEN-LAST:event_btn_doneActionPerformed
+        dropTask();
+    }//GEN-LAST:event_btn_dropTaskActionPerformed
 
     private void tbleMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbleMouseClicked
         // TODO add your handling code here:
@@ -885,13 +980,19 @@ public class Accueil extends javax.swing.JFrame {
         }
         catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Erreur de deplacement"+e.getLocalizedMessage());
+            taskButtons[0] = btn_help;
+            taskButtons[1] = btn_history;
+            taskButtons[2] = btn_addTask;
+            taskButtons[3] = btn_done;
+            taskButtons[4] = btn_dropTask;
+            btnState(taskButtons,false, true);
         }
         taskButtons[0] = btn_help;
         taskButtons[1] = btn_history;
         taskButtons[2] = btn_addTask;
         taskButtons[3] = btn_done;
         taskButtons[4] = btn_dropTask;
-        btnState(taskButtons,true);
+        btnState(taskButtons,true, true);
     }//GEN-LAST:event_tbleMouseClicked
 
     private void ac2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ac2ActionPerformed
@@ -925,11 +1026,6 @@ public class Accueil extends javax.swing.JFrame {
     private void b4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b4ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_b4ActionPerformed
-
-    private void btn_dropTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_dropTaskActionPerformed
-        // TODO add your handling code here:
-        dropTask();
-    }//GEN-LAST:event_btn_dropTaskActionPerformed
 
     /*Génération de button*/
     public void generate_btn(String name) {
