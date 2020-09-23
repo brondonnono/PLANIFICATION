@@ -29,10 +29,13 @@ public class NotificationCellRenderer extends DefaultTableCellRenderer {
         if(elem.equalsIgnoreCase("type")){
             String type = (String) value;
             setText(type);
-            if(type.equals("Alert"))
+            if(type.equals("Alert")){
                 setBackground(Color.red);
-            else
+                setForeground(Color.white);
+            }else{
                 setBackground(Color.yellow);
+                setForeground(Color.white);
+            }
             
         }       
       

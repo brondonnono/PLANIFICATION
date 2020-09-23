@@ -21,6 +21,7 @@ public class HistoryView extends javax.swing.JFrame {
     private Accueil parent;
     private ArrayList<History> historyList,tmpList, historyListArranged = new ArrayList<History>();
     private DefaultTableModel model;
+    private int SelectedTaskId = 0;
     /**
      * Creates new form History
      */
@@ -30,6 +31,10 @@ public class HistoryView extends javax.swing.JFrame {
     
     public HistoryView(Accueil parent) {  
         this.parent = parent;
+        try{
+            this.SelectedTaskId = Integer.parseInt(parent.elem[0]);
+        }catch(NullPointerException e){
+        }catch(NumberFormatException e){}
         this.historyList = this.parent.storageController.getFileReaderHistory().readFileDataHistory();
         this.setTitle(title);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -103,16 +108,20 @@ public class HistoryView extends javax.swing.JFrame {
        // clean(historyList);
     }
     
-    public void JbInit() {
-        if(!parent.elem[0].equals("")) {
-            historyListArranged = ArrangeHistoryList(historyList);
+    public void showSpecifiedHistory(ArrayList<History> historyList){
+                    historyListArranged = ArrangeHistoryList(historyList);
             this.historyList.clear();
             if(!historyListArranged.isEmpty()) {
                 initTable(historyListArranged);
                 clear.setForeground(Color.white);
                 clear.setEnabled(true);
             }
-        }else 
+    }
+    
+    public void JbInit() {
+        if(SelectedTaskId !=0)
+            showSpecifiedHistory(historyList);
+        else 
             showAllHistory(historyList);
         //System.out.println(this.historyListArranged);
     }

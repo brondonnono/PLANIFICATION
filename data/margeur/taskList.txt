@@ -1,12 +1,10 @@
-﻿Tâche-1-article 2-22/09/2020 10:43:10-2812-Graissage à l'huile
-Tâche-1-article 3-22/09/2020 10:43:21-2802-Réglage
-Tâche-1-article 4-22/09/2020 10:43:29-2792-Réglage
-Tâche-1-article 5-22/09/2020 10:43:39-2782-Néttoyage
-Tâche-1-article 6-22/09/2020 10:43:48-2774-Néttoyage
-Tâche-1-article 1-22/09/2020 10:43:03-2818-Graissage à l'huile
-Tâche-1-article 2-22/09/2020 10:43:10-2812-Graissage à l'huile
-Tâche-1-article 3-22/09/2020 10:43:21-2802-Réglage
-Tâche-1-article 4-22/09/2020 10:43:29-2792-Réglage
-Tâche-1-article 5-22/09/2020 10:43:39-2782-Néttoyage
-Tâche-1-article 6-22/09/2020 10:43:48-2774-Néttoyage
-Tâche-1-article 1-22/09/2020 10:43:03-2818-Graissage à l'huile
+﻿Tâche-1-article 2-22/09/2020 10:43:10-724-Graissage à l'huile
+Tâche-1-article 3-22/09/2020 10:43:21-702-Réglage
+Tâche-1-article 4-22/09/2020 10:43:29-686-Réglage
+Tâche-1-article 5-22/09/2020 10:43:39-4556-Néttoyage
+Tâche-1-article 6-22/09/2020 10:43:48-4548-Néttoyage
+Tâche-1-article 1-22/09/2020 10:43:03-4592-Graissage à l'huile
+Tâche-1-article 2-22/09/2020 10:43:10-4586-Graissage à l'huile
+Tâche-1-article 3-22/09/2020 10:43:21-4576-Réglage
+Tâche-1-article 4-22/09/2020 10:43:29-4566-Réglage
+Tâche-1-article 5-22/09/2020 10:43:39-4556-Néttoyage

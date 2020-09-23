@@ -55,10 +55,12 @@ public class validate extends javax.swing.JFrame {
     private void ClearNotification(){
         int equipmentId = MainController.getEquipementByTagName(fen.checked[0]).getId();
         for(int i=0; i<fen.notificationList.size(); i++){
-            if(fen.notificationList.get(i).getEquipmentId() == equipmentId && fen.notificationList.get(i).getTaskId() == Integer.parseInt(fen.elem[0]))
+            if(fen.notificationList.get(i).getEquipmentId() == equipmentId && fen.notificationList.get(i).getTaskId() == Integer.parseInt(fen.elem[0])){
                 fen.notificationList.remove(i);
-
-            return;
+                fen.clean(fen.getNotifModel());
+                fen.showNotification(notificationList);
+                return;
+            }
         }
         //System.out.println("Notif new :"+ newNotificationList);
     }

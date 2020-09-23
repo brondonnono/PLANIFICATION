@@ -40,8 +40,11 @@ public class TbleThread extends Thread{
                         taskListArranged = fen.arrangedTaskList(taskList,fen.checked[1]);
                         //System.out.println("Thread TaskList :"+taskList);
                         if(!taskListArranged.isEmpty())
-                            for(int i = 0; i < fen.taskListArranged.size(); i++)
-                                this.fen.getModel().setValueAt(taskListArranged.get(i).displayOperatingTime(), i, 5);          
+                            for(int i = 0; i < fen.taskListArranged.size(); i++){
+                                try{
+                                    this.fen.getModel().setValueAt(taskListArranged.get(i).displayOperatingTime(), i, 5);
+                                }catch(IndexOutOfBoundsException e){}
+                            }
                     }
 		}
 	}    

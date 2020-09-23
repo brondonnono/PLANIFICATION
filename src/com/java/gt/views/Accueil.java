@@ -341,7 +341,7 @@ public class Accueil extends javax.swing.JFrame {
         return taskListArranged;
     }
 
-    private void clean(){
+    public void clean(DefaultTableModel model){
         if(model != null)
             while(model.getRowCount()>0) 
                 model.removeRow(0);
@@ -828,7 +828,7 @@ public class Accueil extends javax.swing.JFrame {
 
     private void clsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clsActionPerformed
         // TODO add your handling code here:
-        clean();
+        clean(model);
         taskButtons[0] = btn_help;
         taskButtons[1] = btn_history;
         taskButtons[2] = btn_addTask;
